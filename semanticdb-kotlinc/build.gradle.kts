@@ -1,13 +1,10 @@
 import java.net.URI
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import org.gradle.api.publish.maven.MavenPublication
 
 plugins {
     kotlin("jvm")
     id("com.github.johnrengelman.shadow")
-    id("maven-publish")
-    signing
 }
 
 repositories {
@@ -96,70 +93,6 @@ val javadocJar = task<Jar>("javadocJar") {
     dependsOn(tasks.javadoc)
     archiveClassifier.set("javadoc")
     from(tasks.javadoc.get().destinationDir)
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("shadow") {
-            this.apply {
-                pom {
-                    name.set("semanticdb-kotlinc")
-                    description.set("A kotlinc plugin to emit SemanticDB information")
-                    url.set("https://github.com/sourcegraph/lsif-kotlin")
-                    developers {
-                        developer {
-                            id.set("strum355")
-                            name.set("Noah Santschi-Cooney")
-                            email.set("noah@sourcegraph.com")
-                        }
-                        developer {
-                            id.set("olafurpg")
-                            name.set("Ólafur Páll Geirsson")
-                            email.set("olafurpg@sourcegraph.com")
-                        }
-                    }
-                    licenses {
-                        license {
-                            name.set("The Apache License, Version 2.0")
-                            url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
-                        }
-                    }
-                    scm {
-                        url.set("https://github.com/sourcegraph/lsif-kotlin")
-                    }
-                }
-                shadow.component(this)
-                artifact(sourceJar)
-                artifact(javadocJar)
-            }
-        }
-    }
-    repositories {
-        mavenLocal()
-        maven {
-            name = "sonatype"
-            url =
-                if (!(version as String).endsWith("-SNAPSHOT"))
-                    URI("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
-                else
-                    URI("https://oss.sonatype.org/content/repositories/snapshots/")
-            credentials {
-                username = System.getenv("SONATYPE_USERNAME")
-                password = System.getenv("SONATYPE_PASSWORD")
-            }
-        }
-    }
-}
-
-signing {
-    val signingKey: String? by project
-    val signingPassword: String? by project
-    useInMemoryPgpKeys(signingKey, signingPassword)
-    sign(publishing.publications["shadow"])
-}
-
-tasks.withType<Sign>().configureEach {
-    onlyIf { !(project.version as String).endsWith("SNAPSHOT") }
 }
 
 tasks.test {
