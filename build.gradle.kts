@@ -1,9 +1,7 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import groovy.lang.Closure
-import org.gradle.jvm.toolchain.internal.CurrentJvmToolchainSpec
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    kotlin("jvm") version "2.1.20"
+    kotlin("jvm") version "2.2.0-RC"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("com.diffplug.spotless") version "5.17.1"
 }
@@ -25,11 +23,10 @@ repositories {
 
 allprojects {
     afterEvaluate {
-        tasks.withType<KotlinCompile> {
-            kotlinOptions.jvmTarget = "1.8"
-        }
-
         kotlin {
+            compilerOptions {
+                jvmTarget = JvmTarget.JVM_1_8
+            }
             jvmToolchain {
                 (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(8))
             }
