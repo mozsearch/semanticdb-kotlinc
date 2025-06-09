@@ -1,10 +1,11 @@
-# Kotlin SCIP support
-<img src="https://img.shields.io/maven-central/v/com.sourcegraph/semanticdb-kotlinc?style=flat-square" />
+# Kotlin SemanticDB support
 
 This codebase implements a Kotlin compiler plugin that can be used together with
 [scip-java](https://sourcegraph.github.io/scip-java) to emit
 [SCIP](https://github.com/sourcegraph/scip) indexes for Kotlin projects.
 
+This is forked from [github.com/mozsearch/semanticdb-kotlinc](https://github.com/mozsearch/semanticdb-kotlinc)
+with added support for Kotlin 2+ for use in [Searchfox](https://searchfox.org).
 
 ## Getting started
 
@@ -15,14 +16,19 @@ even if you have no Java code.
 
 ## Kotlin version compatibility
 
-Any given release of scip-kotlin only supports one major version of Kotlin.
-Use the table below to find the version of scip-kotlin that matches the Kotlin
-version you are using in your project.
+Because this plugin uses compiler internals, any given release of semanticdb-kotlinc
+only supports one version of Kotlin. Use the table below to find the version of
+semanticdb-kotlinc that matches the Kotlin version you are using in your project.
 
-| Kotlin version | scip-kotlin version |
-|----------------|---------------------|
-| 1.8.x          | 0.3.2               |
-| 1.9.x          | 0.4.0               |
+| Kotlin version | semanticdb-kotlinc version |
+|----------------|----------------------------|
+| 1.8.x          | 0.3.2                      |
+| 1.9.x          | 0.4.0                      |
+| 2.1.20         | 0.5.0                      |
+
+The default `main` branch targets the next Kotlin release. The `kotlin-x.y.z`
+branches target the relevant Kotlin version. Bugfixes and improvements will only
+be backported to branches targeting Kotlin releases used by Searchfox.
 
 ## SemanticDB support
 
