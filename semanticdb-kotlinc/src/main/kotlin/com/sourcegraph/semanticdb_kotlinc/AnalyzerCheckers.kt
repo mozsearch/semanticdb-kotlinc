@@ -138,7 +138,9 @@ open class AnalyzerCheckers(session: FirSession) : FirAdditionalCheckersExtensio
             val fqName = packageDirective.packageFqName
             val source = packageDirective.source
             if (source != null) {
-                val names = source.treeStructure.findLastDescendant(source.lighterASTNode) { true }
+                val names = source.treeStructure.findChildByType(source.lighterASTNode, KtNodeTypes.DOT_QUALIFIED_EXPRESSION) ?:
+                    source.treeStructure.findChildByType(source.lighterASTNode, KtNodeTypes.REFERENCE_EXPRESSION)
+
                 if (names != null) {
                     eachFqNameElement(fqName, source.treeStructure, names) { fqName, name ->
                         visitor?.visitPackage(fqName, name, context)

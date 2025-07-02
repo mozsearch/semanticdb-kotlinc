@@ -1183,6 +1183,166 @@ class AnalyzerTest {
         result.exitCode shouldBe KotlinCompilation.ExitCode.OK
     }
 
+
+    @Test
+    fun `compound package name semicolon test`(@TempDir path: Path) {
+        val document =
+            compileSemanticdb(
+                path, """
+            package hello.sample;
+            class Apple
+            """.trimIndent()
+            )
+
+        val occurrences =
+            arrayOf(
+                SymbolOccurrence {
+                    role = Role.REFERENCE
+                    symbol = "hello/"
+                    range {
+                        startLine = 0
+                        startCharacter = 8
+                        endLine = 0
+                        endCharacter = 13
+                    }
+                },
+                SymbolOccurrence {
+                    role = Role.REFERENCE
+                    symbol = "hello/sample/"
+                    range {
+                        startLine = 0
+                        startCharacter = 14
+                        endLine = 0
+                        endCharacter = 20
+                    }
+                },
+                SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "hello/sample/Apple#"
+                    range {
+                        startLine = 1
+                        startCharacter = 6
+                        endLine = 1
+                        endCharacter = 11
+                    }
+                },
+                SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "hello/sample/Apple#`<init>`()."
+                    range {
+                        startLine = 1
+                        startCharacter = 6
+                        endLine = 1
+                        endCharacter = 11
+                    }
+                },
+            )
+
+        assertSoftly(document.occurrencesList) {
+            withClue(document.occurrencesList) { occurrences.forEach(::shouldContain) }
+        }
+
+        val symbols =
+            arrayOf(
+                SymbolInformation {
+                    symbol = "hello/sample/Apple#"
+                    language = KOTLIN
+                    displayName = "Apple"
+                    documentation =
+                        Documentation {
+                            format = Semanticdb.Documentation.Format.MARKDOWN
+                            message = "```kotlin\npublic final class Apple : Any\n```"
+                        }
+                })
+
+        assertSoftly(document.symbolsList) { withClue(this) { symbols.forEach(::shouldContain) } }
+    }
+
+
+    @Test
+    fun `simple package name semicolon test`(@TempDir path: Path) {
+        val document =
+            compileSemanticdb(
+                path,
+                """
+            package sample;
+            class Banana {
+                fun foo() { }
+            }"""
+            )
+
+        val occurrences =
+            arrayOf(
+                SymbolOccurrence {
+                    role = Role.REFERENCE
+                    symbol = "sample/"
+                    range {
+                        startLine = 0
+                        startCharacter = 8
+                        endLine = 0
+                        endCharacter = 14
+                    }
+                },
+                SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "sample/Banana#"
+                    range {
+                        startLine = 1
+                        startCharacter = 6
+                        endLine = 1
+                        endCharacter = 12
+                    }
+                },
+                SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "sample/Banana#foo()."
+                    range {
+                        startLine = 2
+                        startCharacter = 8
+                        endLine = 2
+                        endCharacter = 11
+                    }
+                },
+                SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "sample/Banana#"
+                    range {
+                        startLine = 1
+                        startCharacter = 6
+                        endLine = 1
+                        endCharacter = 12
+                    }
+                },
+            )
+        assertSoftly(document.occurrencesList) {
+            withClue(this) { occurrences.forEach(::shouldContain) }
+        }
+
+        val symbols =
+            arrayOf(
+                SymbolInformation {
+                    symbol = "sample/Banana#"
+                    language = KOTLIN
+                    displayName = "Banana"
+                    documentation =
+                        Documentation {
+                            format = Semanticdb.Documentation.Format.MARKDOWN
+                            message = "```kotlin\npublic final class Banana : Any\n```"
+                        }
+                },
+                SymbolInformation {
+                    symbol = "sample/Banana#foo()."
+                    language = KOTLIN
+                    displayName = "foo"
+                    documentation =
+                        Documentation {
+                            format = Semanticdb.Documentation.Format.MARKDOWN
+                            message = "```kotlin\npublic final fun foo(): Unit\n```"
+                        }
+                })
+        assertSoftly(document.symbolsList) { withClue(this) { symbols.forEach(::shouldContain) } }
+    }
+
     @Test
     fun documentation(@TempDir path: Path) {
         val document =
