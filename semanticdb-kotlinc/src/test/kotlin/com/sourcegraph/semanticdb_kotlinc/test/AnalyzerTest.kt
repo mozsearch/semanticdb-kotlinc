@@ -483,7 +483,7 @@ class AnalyzerTest {
                 },
                 SymbolOccurrence {
                     role = Role.DEFINITION
-                    symbol = "sample/`<anonymous object at 80>`#"
+                    symbol = "local1"
                     range {
                         startLine = 7
                         startCharacter = 12
@@ -493,7 +493,7 @@ class AnalyzerTest {
                 },
                 SymbolOccurrence {
                     role = Role.DEFINITION
-                    symbol = "sample/`<anonymous object at 80>`#`<init>`()."
+                    symbol = "local2"
                     range {
                         startLine = 7
                         startCharacter = 12
@@ -513,7 +513,7 @@ class AnalyzerTest {
                 },
                 SymbolOccurrence {
                     role = Role.DEFINITION
-                    symbol = "sample/`<anonymous object at 80>`#foo()."
+                    symbol = "local3"
                     range {
                         startLine = 8
                         startCharacter = 21
@@ -523,7 +523,7 @@ class AnalyzerTest {
                 },
                 SymbolOccurrence {
                     role = Role.DEFINITION
-                    symbol = "sample/`<anonymous object at 149>`#"
+                    symbol = "local5"
                     range {
                         startLine = 10
                         startCharacter = 12
@@ -533,7 +533,7 @@ class AnalyzerTest {
                 },
                 SymbolOccurrence {
                     role = Role.DEFINITION
-                    symbol = "sample/`<anonymous object at 149>`#`<init>`()."
+                    symbol = "local6"
                     range {
                         startLine = 10
                         startCharacter = 12
@@ -553,7 +553,7 @@ class AnalyzerTest {
                 },
                 SymbolOccurrence {
                     role = Role.DEFINITION
-                    symbol = "sample/`<anonymous object at 149>`#foo()."
+                    symbol = "local7"
                     range {
                         startLine = 11
                         startCharacter = 21
@@ -578,7 +578,7 @@ class AnalyzerTest {
                     }
                 },
                 SymbolInformation {
-                    symbol = "sample/`<anonymous object at 80>`#"
+                    symbol = "local1"
                     displayName = "<anonymous>"
                     language = KOTLIN
                     documentation {
@@ -588,7 +588,7 @@ class AnalyzerTest {
                     addOverriddenSymbols("sample/Interface#")
                 },
                 SymbolInformation {
-                    symbol = "sample/`<anonymous object at 80>`#foo()."
+                    symbol = "local3"
                     displayName = "foo"
                     language = KOTLIN
                     documentation {
@@ -598,7 +598,7 @@ class AnalyzerTest {
                     addOverriddenSymbols("sample/Interface#foo().")
                 },
                 SymbolInformation {
-                    symbol = "sample/`<anonymous object at 149>`#"
+                    symbol = "local5"
                     displayName = "<anonymous>"
                     language = KOTLIN
                     documentation {
@@ -608,7 +608,7 @@ class AnalyzerTest {
                     addOverriddenSymbols("sample/Interface#")
                 },
                 SymbolInformation {
-                    symbol = "sample/`<anonymous object at 149>`#foo()."
+                    symbol = "local7"
                     displayName = "foo"
                     language = KOTLIN
                     documentation {
