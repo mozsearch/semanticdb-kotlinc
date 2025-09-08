@@ -17,7 +17,6 @@ import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.*
 import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.util.capitalizeDecapitalize.capitalizeAsciiOnly
 
 @ExperimentalContracts
 class GlobalSymbolsCache(testing: Boolean = false) : Iterable<Symbol> {
@@ -123,6 +122,7 @@ class GlobalSymbolsCache(testing: Boolean = false) : Iterable<Symbol> {
             is FirTypeParameterSymbol ->
                 return getSymbol(symbol.containingDeclarationSymbol, locals)
             is FirValueParameterSymbol -> return getSymbol(symbol.containingDeclarationSymbol, locals)
+            is FirPropertyAccessorSymbol -> return getSymbol(symbol.propertySymbol, locals)
             is FirCallableSymbol -> {
                 val session = symbol.fir.moduleData.session
                 return symbol.getContainingSymbol(session)?.let { getSymbol(it, locals) }
@@ -150,13 +150,9 @@ class GlobalSymbolsCache(testing: Boolean = false) : Iterable<Symbol> {
             symbol is FirClassLikeSymbol ->
                 SemanticdbSymbolDescriptor(Kind.TYPE, symbol.classId.shortClassName.asString())
             symbol is FirPropertyAccessorSymbol && symbol.isSetter ->
-                SemanticdbSymbolDescriptor(
-                    Kind.METHOD,
-                    "set" + symbol.propertySymbol.fir.name.toString().capitalizeAsciiOnly())
+                SemanticdbSymbolDescriptor(Kind.METHOD, "set")
             symbol is FirPropertyAccessorSymbol && symbol.isGetter ->
-                SemanticdbSymbolDescriptor(
-                    Kind.METHOD,
-                    "get" + symbol.propertySymbol.fir.name.toString().capitalizeAsciiOnly())
+                SemanticdbSymbolDescriptor(Kind.METHOD, "get")
             symbol is FirConstructorSymbol ->
                 SemanticdbSymbolDescriptor(Kind.METHOD, "<init>", methodDisambiguator(symbol))
             symbol is FirFunctionSymbol ->
