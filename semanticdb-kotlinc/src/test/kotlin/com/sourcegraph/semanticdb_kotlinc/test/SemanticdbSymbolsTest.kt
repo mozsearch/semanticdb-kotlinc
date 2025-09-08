@@ -616,6 +616,7 @@ class SemanticdbSymbolsTest {
                                     SymbolInformation {
                                         symbol = "x."
                                         kind = Kind.FIELD
+                                        enclosingSymbol = "_root_/"
                                         displayName = "x"
                                         language = Language.KOTLIN
                                         documentation {
@@ -627,6 +628,7 @@ class SemanticdbSymbolsTest {
                                     SymbolInformation {
                                         symbol = "x.get()."
                                         kind = Kind.METHOD
+                                        enclosingSymbol = "x."
                                         displayName = "x"
                                         language = Language.KOTLIN
                                         documentation {
