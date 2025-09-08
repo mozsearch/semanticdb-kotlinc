@@ -3,6 +3,7 @@ package com.sourcegraph.semanticdb_kotlinc.test
 import com.sourcegraph.semanticdb_kotlinc.*
 import com.sourcegraph.semanticdb_kotlinc.Semanticdb.Documentation.Format
 import com.sourcegraph.semanticdb_kotlinc.Semanticdb.Language
+import com.sourcegraph.semanticdb_kotlinc.Semanticdb.SymbolInformation.Kind
 import com.sourcegraph.semanticdb_kotlinc.Semanticdb.SymbolOccurrence.Role
 import com.sourcegraph.semanticdb_kotlinc.test.ExpectedSymbols.SemanticdbData
 import com.sourcegraph.semanticdb_kotlinc.test.ExpectedSymbols.SymbolCacheData
@@ -614,6 +615,7 @@ class SemanticdbSymbolsTest {
                                 listOf(
                                     SymbolInformation {
                                         symbol = "x."
+                                        kind = Kind.FIELD
                                         displayName = "x"
                                         language = Language.KOTLIN
                                         documentation {
@@ -624,6 +626,7 @@ class SemanticdbSymbolsTest {
                                     },
                                     SymbolInformation {
                                         symbol = "getX()."
+                                        kind = Kind.METHOD
                                         displayName = "x"
                                         language = Language.KOTLIN
                                         documentation {
