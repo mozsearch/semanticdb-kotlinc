@@ -229,7 +229,7 @@ class SemanticdbSymbolsTest {
                                     },
                                     SymbolOccurrence {
                                         role = Role.DEFINITION
-                                        symbol = "getX()."
+                                        symbol = "x.get()."
                                         range {
                                             startLine = 0
                                             startCharacter = 4
@@ -239,7 +239,7 @@ class SemanticdbSymbolsTest {
                                     },
                                     SymbolOccurrence {
                                         role = Role.DEFINITION
-                                        symbol = "setX()."
+                                        symbol = "x.set()."
                                         range {
                                             startLine = 0
                                             startCharacter = 4
@@ -271,7 +271,7 @@ class SemanticdbSymbolsTest {
                                     },
                                     SymbolOccurrence {
                                         role = Role.DEFINITION
-                                        symbol = "setX()."
+                                        symbol = "x.set()."
                                         range {
                                             startLine = 0
                                             startCharacter = 4
@@ -281,7 +281,7 @@ class SemanticdbSymbolsTest {
                                     },
                                     SymbolOccurrence {
                                         role = Role.DEFINITION
-                                        symbol = "getX()."
+                                        symbol = "x.get()."
                                         range {
                                             startLine = 1
                                             startCharacter = 4
@@ -313,7 +313,7 @@ class SemanticdbSymbolsTest {
                                     },
                                     SymbolOccurrence {
                                         role = Role.DEFINITION
-                                        symbol = "getX()."
+                                        symbol = "x.get()."
                                         range {
                                             startLine = 0
                                             startCharacter = 4
@@ -323,7 +323,7 @@ class SemanticdbSymbolsTest {
                                     },
                                     SymbolOccurrence {
                                         role = Role.DEFINITION
-                                        symbol = "setX()."
+                                        symbol = "x.set()."
                                         range {
                                             startLine = 1
                                             startCharacter = 4
@@ -356,7 +356,7 @@ class SemanticdbSymbolsTest {
                                     },
                                     SymbolOccurrence {
                                         role = Role.DEFINITION
-                                        symbol = "getX()."
+                                        symbol = "x.get()."
                                         range {
                                             startLine = 1
                                             startCharacter = 4
@@ -366,7 +366,7 @@ class SemanticdbSymbolsTest {
                                     },
                                     SymbolOccurrence {
                                         role = Role.DEFINITION
-                                        symbol = "setX()."
+                                        symbol = "x.set()."
                                         range {
                                             startLine = 2
                                             startCharacter = 4
@@ -411,7 +411,7 @@ class SemanticdbSymbolsTest {
                                     },
                                     SymbolOccurrence {
                                         role = Role.DEFINITION
-                                        symbol = "Test#getSample()."
+                                        symbol = "Test#sample.get()."
                                         range {
                                             startLine = 0
                                             startCharacter = 15
@@ -421,7 +421,7 @@ class SemanticdbSymbolsTest {
                                     },
                                     SymbolOccurrence {
                                         role = Role.DEFINITION
-                                        symbol = "Test#setSample()."
+                                        symbol = "Test#sample.set()."
                                         range {
                                             startLine = 0
                                             startCharacter = 15
@@ -451,7 +451,7 @@ class SemanticdbSymbolsTest {
                                     },
                                     SymbolOccurrence {
                                         role = Role.REFERENCE
-                                        symbol = "Test#getSample()."
+                                        symbol = "Test#sample.get()."
                                         range {
                                             startLine = 2
                                             startCharacter = 16
@@ -625,7 +625,7 @@ class SemanticdbSymbolsTest {
                                         }
                                     },
                                     SymbolInformation {
-                                        symbol = "getX()."
+                                        symbol = "x.get()."
                                         kind = Kind.METHOD
                                         displayName = "x"
                                         language = Language.KOTLIN
