@@ -2,6 +2,7 @@ package com.sourcegraph.semanticdb_kotlinc.test
 
 import com.sourcegraph.semanticdb_kotlinc.*
 import com.sourcegraph.semanticdb_kotlinc.Semanticdb.Language.KOTLIN
+import com.sourcegraph.semanticdb_kotlinc.Semanticdb.SymbolInformation.Kind
 import com.sourcegraph.semanticdb_kotlinc.Semanticdb.SymbolOccurrence.Role
 import com.sourcegraph.semanticdb_kotlinc.Semanticdb.TextDocument
 import com.tschuchort.compiletesting.KotlinCompilation
@@ -101,6 +102,7 @@ class AnalyzerTest {
             arrayOf(
                 SymbolInformation {
                     symbol = "sample/Banana#"
+                    kind = Kind.CLASS
                     language = KOTLIN
                     displayName = "Banana"
                     documentation =
@@ -111,6 +113,7 @@ class AnalyzerTest {
                 },
                 SymbolInformation {
                     symbol = "sample/Banana#foo()."
+                    kind = Kind.METHOD
                     language = KOTLIN
                     displayName = "foo"
                     documentation =
@@ -261,6 +264,7 @@ class AnalyzerTest {
             arrayOf(
                 SymbolInformation {
                     symbol = "sample/foo()."
+                    kind = Kind.METHOD
                     displayName = "foo"
                     language = KOTLIN
                     documentation {
@@ -270,6 +274,7 @@ class AnalyzerTest {
                 },
                 SymbolInformation {
                     symbol = "local0"
+                    kind = Kind.CLASS
                     displayName = "LocalClass"
                     language = KOTLIN
                     documentation {
@@ -279,6 +284,7 @@ class AnalyzerTest {
                 },
                 SymbolInformation {
                     symbol = "local1"
+                    kind = Kind.CONSTRUCTOR
                     displayName = "LocalClass"
                     language = KOTLIN
                     documentation {
@@ -288,6 +294,7 @@ class AnalyzerTest {
                 },
                 SymbolInformation {
                     symbol = "local2"
+                    kind = Kind.METHOD
                     displayName = "localClassMethod"
                     language = KOTLIN
                     documentation {
@@ -387,6 +394,7 @@ class AnalyzerTest {
             arrayOf(
                 SymbolInformation {
                     symbol = "sample/Interface#"
+                    kind = Kind.INTERFACE
                     displayName = "Interface"
                     language = KOTLIN
                     documentation {
@@ -396,6 +404,7 @@ class AnalyzerTest {
                 },
                 SymbolInformation {
                     symbol = "sample/Interface#foo()."
+                    kind = Kind.METHOD
                     displayName = "foo"
                     language = KOTLIN
                     documentation {
@@ -405,6 +414,7 @@ class AnalyzerTest {
                 },
                 SymbolInformation {
                     symbol = "sample/Class#"
+                    kind = Kind.CLASS
                     displayName = "Class"
                     language = KOTLIN
                     documentation {
@@ -415,6 +425,7 @@ class AnalyzerTest {
                 },
                 SymbolInformation {
                     symbol = "sample/Class#foo()."
+                    kind = Kind.METHOD
                     displayName = "foo"
                     language = KOTLIN
                     documentation {
@@ -570,6 +581,7 @@ class AnalyzerTest {
             arrayOf(
                 SymbolInformation {
                     symbol = "sample/Interface#"
+                    kind = Kind.INTERFACE
                     displayName = "Interface"
                     language = KOTLIN
                     documentation {
@@ -579,6 +591,7 @@ class AnalyzerTest {
                 },
                 SymbolInformation {
                     symbol = "local1"
+                    kind = Kind.CLASS
                     displayName = "<anonymous>"
                     language = KOTLIN
                     documentation {
@@ -589,6 +602,7 @@ class AnalyzerTest {
                 },
                 SymbolInformation {
                     symbol = "local3"
+                    kind = Kind.METHOD
                     displayName = "foo"
                     language = KOTLIN
                     documentation {
@@ -599,6 +613,7 @@ class AnalyzerTest {
                 },
                 SymbolInformation {
                     symbol = "local5"
+                    kind = Kind.CLASS
                     displayName = "<anonymous>"
                     language = KOTLIN
                     documentation {
@@ -609,6 +624,7 @@ class AnalyzerTest {
                 },
                 SymbolInformation {
                     symbol = "local7"
+                    kind = Kind.METHOD
                     displayName = "foo"
                     language = KOTLIN
                     documentation {
@@ -1246,6 +1262,7 @@ class AnalyzerTest {
             arrayOf(
                 SymbolInformation {
                     symbol = "hello/sample/Apple#"
+                    kind = Kind.CLASS
                     language = KOTLIN
                     displayName = "Apple"
                     documentation =
@@ -1322,6 +1339,7 @@ class AnalyzerTest {
             arrayOf(
                 SymbolInformation {
                     symbol = "sample/Banana#"
+                    kind = Kind.CLASS
                     language = KOTLIN
                     displayName = "Banana"
                     documentation =
@@ -1332,6 +1350,7 @@ class AnalyzerTest {
                 },
                 SymbolInformation {
                     symbol = "sample/Banana#foo()."
+                    kind = Kind.METHOD
                     language = KOTLIN
                     displayName = "foo"
                     documentation =

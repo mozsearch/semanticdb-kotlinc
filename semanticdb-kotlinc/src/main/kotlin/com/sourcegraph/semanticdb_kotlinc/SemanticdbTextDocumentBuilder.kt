@@ -1,5 +1,6 @@
 package com.sourcegraph.semanticdb_kotlinc
 
+import com.sourcegraph.semanticdb_kotlinc.Semanticdb.SymbolInformation.Kind
 import com.sourcegraph.semanticdb_kotlinc.Semanticdb.SymbolOccurrence.Role
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -9,10 +10,13 @@ import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.KtSourceFile
 import org.jetbrains.kotlin.com.intellij.lang.java.JavaLanguage
 import org.jetbrains.kotlin.fir.FirElement
+import org.jetbrains.kotlin.fir.FirPackageDirective
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.analysis.checkers.directOverriddenSymbolsSafe
 import org.jetbrains.kotlin.fir.analysis.checkers.toClassLikeSymbol
 import org.jetbrains.kotlin.fir.analysis.getChild
+import org.jetbrains.kotlin.fir.declarations.*
+import org.jetbrains.kotlin.fir.declarations.utils.isInterface
 import org.jetbrains.kotlin.fir.renderer.*
 import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
@@ -100,6 +104,7 @@ class SemanticdbTextDocumentBuilder(
                         message = ""
                     }
                 }
+            this.kind = semanticdbKind(firBasedSymbol?.fir)
             this.addAllOverriddenSymbols(supers.map { it.toString() })
             this.language =
                 when (element.psi?.language ?: KotlinLanguage.INSTANCE) {
@@ -160,6 +165,21 @@ class SemanticdbTextDocumentBuilder(
         val kdoc = element.source?.getChild(KtTokens.DOC_COMMENT)?.text?.toString() ?: ""
         message = "```kotlin\n$renderOutput\n```${stripKDocAsterisks(kdoc)}"
     }
+
+    private fun semanticdbKind(element: FirElement?): Kind =
+        when (element) {
+            is FirClass if element.isInterface -> Kind.INTERFACE
+            is FirClassLikeDeclaration -> Kind.CLASS
+            is FirConstructor -> Kind.CONSTRUCTOR
+            is FirTypeParameter -> Kind.TYPE_PARAMETER
+            is FirValueParameter -> Kind.PARAMETER
+            is FirField -> Kind.FIELD
+            is FirProperty -> Kind.FIELD
+            is FirVariable -> Kind.LOCAL
+            is FirCallableDeclaration -> Kind.METHOD
+            is FirPackageDirective -> Kind.PACKAGE
+            else -> Kind.UNKNOWN_KIND
+        }
 
     // Returns the kdoc string with all leading and trailing "/*" tokens removed. Naive
     // implementation that can
