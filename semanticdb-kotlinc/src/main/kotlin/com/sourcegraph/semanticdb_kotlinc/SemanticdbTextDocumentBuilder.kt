@@ -93,6 +93,8 @@ class SemanticdbTextDocumentBuilder(
             this.displayName = firBasedSymbol?.let { displayName(it) } ?: element.text.toString()
             this.documentation = semanticdbDocumentation(firBasedSymbol?.fir)
             this.kind = semanticdbKind(firBasedSymbol?.fir)
+            this.enclosingSymbol =
+                context.containingDeclarations.lastOrNull()?.let { cache[it].last().toString() } ?: ""
             this.addAllOverriddenSymbols(supers.map { it.toString() })
             this.language =
                 when (element.psi?.language ?: KotlinLanguage.INSTANCE) {
