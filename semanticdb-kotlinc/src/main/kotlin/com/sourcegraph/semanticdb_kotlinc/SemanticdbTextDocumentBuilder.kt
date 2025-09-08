@@ -80,30 +80,18 @@ class SemanticdbTextDocumentBuilder(
                     firBasedSymbol
                         .resolvedSuperTypeRefs
                         .filter { it !is FirImplicitAnyTypeRef }
-                        .map { it.toClassLikeSymbol(firBasedSymbol.moduleData.session) }
-                        .filterNotNull()
+                        .mapNotNull { it.toClassLikeSymbol(firBasedSymbol.moduleData.session) }
                         .flatMap { cache[it] }
+
                 is FirFunctionSymbol<*> ->
                     firBasedSymbol.directOverriddenSymbolsSafe().flatMap { cache[it] }
+
                 else -> emptyList<Symbol>().asIterable()
             }
         return SymbolInformation {
             this.symbol = symbol.toString()
-            this.displayName =
-                if (firBasedSymbol != null) {
-                    displayName(firBasedSymbol)
-                } else {
-                    element.text.toString()
-                }
-            this.documentation =
-                if (firBasedSymbol != null) {
-                    semanticdbDocumentation(firBasedSymbol.fir)
-                } else {
-                    Documentation {
-                        format = Semanticdb.Documentation.Format.MARKDOWN
-                        message = ""
-                    }
-                }
+            this.displayName = firBasedSymbol?.let { displayName(it) } ?: element.text.toString()
+            this.documentation = semanticdbDocumentation(firBasedSymbol?.fir)
             this.kind = semanticdbKind(firBasedSymbol?.fir)
             this.addAllOverriddenSymbols(supers.map { it.toString() })
             this.language =
@@ -119,22 +107,20 @@ class SemanticdbTextDocumentBuilder(
         symbol: Symbol,
         element: KtSourceElement,
         role: Role
-    ): Semanticdb.SymbolOccurrence {
-        return SymbolOccurrence {
+    ): Semanticdb.SymbolOccurrence =
+        SymbolOccurrence {
             this.symbol = symbol.toString()
             this.role = role
             this.range = semanticdbRange(element)
         }
-    }
 
-    private fun semanticdbRange(element: KtSourceElement): Semanticdb.Range {
-        return Range {
+    private fun semanticdbRange(element: KtSourceElement): Semanticdb.Range =
+        Range {
             startCharacter = lineMap.startCharacter(element)
             startLine = lineMap.lineNumber(element) - 1
             endCharacter = lineMap.endCharacter(element)
             endLine = lineMap.lineNumber(element) - 1
         }
-    }
 
     private fun semanticdbURI(): String {
         // TODO: unix-style only
@@ -147,23 +133,36 @@ class SemanticdbTextDocumentBuilder(
             .digest(file.getContentsAsStream().readBytes())
             .joinToString("") { "%02X".format(it) }
 
-    private fun semanticdbDocumentation(element: FirElement): Semanticdb.Documentation = Documentation {
+    @OptIn(SymbolInternals::class, RenderingInternals::class)
+    private fun displayName(firBasedSymbol: FirBasedSymbol<*>): String =
+        when (firBasedSymbol) {
+            is FirClassSymbol -> firBasedSymbol.classId.shortClassName.asString()
+            is FirPropertyAccessorSymbol -> firBasedSymbol.fir.propertySymbol.name.asString()
+            is FirFunctionSymbol -> firBasedSymbol.callableId.callableName.asString()
+            is FirPropertySymbol -> firBasedSymbol.callableIdForRendering.callableName.asString()
+            is FirVariableSymbol -> firBasedSymbol.name.asString()
+            else -> firBasedSymbol.toString()
+        }
+
+    private fun semanticdbDocumentation(element: FirElement?): Semanticdb.Documentation = Documentation {
         format = Semanticdb.Documentation.Format.MARKDOWN
-        // Like FirRenderer().forReadability, but using FirAllModifierRenderer instead of FirPartialModifierRenderer
-        val renderer = FirRenderer(
-            typeRenderer = ConeTypeRenderer(),
-            idRenderer = ConeIdShortRenderer(),
-            classMemberRenderer = FirNoClassMemberRenderer(),
-            bodyRenderer = null,
-            propertyAccessorRenderer = null,
-            callArgumentsRenderer = FirCallNoArgumentsRenderer(),
-            modifierRenderer = FirAllModifierRenderer(),
-            callableSignatureRenderer = FirCallableSignatureRendererForReadability(),
-            declarationRenderer = FirDeclarationRenderer("local "),
-        )
-        val renderOutput = renderer.renderElementAsString(element)
-        val kdoc = element.source?.getChild(KtTokens.DOC_COMMENT)?.text?.toString() ?: ""
-        message = "```kotlin\n$renderOutput\n```${stripKDocAsterisks(kdoc)}"
+        message = element?.let {
+            // Like FirRenderer().forReadability, but using FirAllModifierRenderer instead of FirPartialModifierRenderer
+            val renderer = FirRenderer(
+                typeRenderer = ConeTypeRenderer(),
+                idRenderer = ConeIdShortRenderer(),
+                classMemberRenderer = FirNoClassMemberRenderer(),
+                bodyRenderer = null,
+                propertyAccessorRenderer = null,
+                callArgumentsRenderer = FirCallNoArgumentsRenderer(),
+                modifierRenderer = FirAllModifierRenderer(),
+                callableSignatureRenderer = FirCallableSignatureRendererForReadability(),
+                declarationRenderer = FirDeclarationRenderer("local "),
+            )
+            val renderOutput = renderer.renderElementAsString(it)
+            val kdoc = it.source?.getChild(KtTokens.DOC_COMMENT)?.text?.toString() ?: ""
+            "```kotlin\n$renderOutput\n```${stripKDocAsterisks(kdoc)}"
+        } ?: ""
     }
 
     private fun semanticdbKind(element: FirElement?): Kind =
@@ -216,18 +215,5 @@ class SemanticdbTextDocumentBuilder(
             out.append("\n").append(line, start, end)
         }
         return out.toString()
-    }
-
-    companion object {
-        @OptIn(SymbolInternals::class, RenderingInternals::class)
-        private fun displayName(firBasedSymbol: FirBasedSymbol<*>): String =
-            when (firBasedSymbol) {
-                is FirClassSymbol -> firBasedSymbol.classId.shortClassName.asString()
-                is FirPropertyAccessorSymbol -> firBasedSymbol.fir.propertySymbol.name.asString()
-                is FirFunctionSymbol -> firBasedSymbol.callableId.callableName.asString()
-                is FirPropertySymbol -> firBasedSymbol.callableIdForRendering.callableName.asString()
-                is FirVariableSymbol -> firBasedSymbol.name.asString()
-                else -> firBasedSymbol.toString()
-            }
     }
 }
