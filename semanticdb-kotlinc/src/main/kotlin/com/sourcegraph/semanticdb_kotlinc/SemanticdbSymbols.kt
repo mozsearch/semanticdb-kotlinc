@@ -66,5 +66,6 @@ data class SemanticdbSymbolDescriptor(
                 Kind.PACKAGE -> "${encodeName(name)}/"
                 Kind.PARAMETER -> "(${encodeName(name)})"
                 Kind.TYPE_PARAMETER -> "[${encodeName(name)}]"
-            })
+            }
+        )
 }

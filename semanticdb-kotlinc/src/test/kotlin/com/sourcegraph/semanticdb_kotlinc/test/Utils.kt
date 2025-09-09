@@ -65,7 +65,8 @@ fun List<ExpectedSymbols>.mapCheckExpectedSymbols(): List<DynamicTest> =
             dynamicTest("$testName - symbols") {
                 symbolsData?.apply {
                     println(
-                        "checking symbols: ${expectedGlobals?.size ?: 0} globals and presence of $localsCount locals")
+                        "checking symbols: ${expectedGlobals?.size ?: 0} globals and presence of $localsCount locals"
+                    )
                     checkContainsExpectedSymbols(globals, locals, expectedGlobals, localsCount)
                 }
                     ?: assumeFalse(true)
@@ -73,7 +74,8 @@ fun List<ExpectedSymbols>.mapCheckExpectedSymbols(): List<DynamicTest> =
             dynamicTest("$testName - semanticdb") {
                 semanticdbData?.apply {
                     println(
-                        "checking semanticdb: ${expectedOccurrences?.size ?: 0} occurrences and ${expectedSymbols?.size ?: 0} symbols")
+                        "checking semanticdb: ${expectedOccurrences?.size ?: 0} occurrences and ${expectedSymbols?.size ?: 0} symbols"
+                    )
                     checkContainsExpectedSemanticdb(document, expectedOccurrences, expectedSymbols)
                 }
                     ?: assumeFalse(true)
@@ -140,7 +142,8 @@ private class TestAnalyzerDeclarationCheckers(
                     visitors[ktFile] = visitor
                 }
             },
-            AnalyzerCheckers.SemanticImportsChecker())
+            AnalyzerCheckers.SemanticImportsChecker()
+        )
 }
 
 private class TestAnalyzerCheckers(session: FirSession) : AnalyzerCheckers(session) {
@@ -194,7 +197,9 @@ fun semanticdbVisitorAnalyzer(
                 })
             IrGenerationExtension.registerExtension(
                 PostAnalysisExtension(
-                    sourceRoot = sourceroot, targetRoot = Paths.get(""), callback = hook))
+                    sourceRoot = sourceroot, targetRoot = Paths.get(""), callback = hook
+                )
+            )
         }
 
         override val supportsK2: Boolean

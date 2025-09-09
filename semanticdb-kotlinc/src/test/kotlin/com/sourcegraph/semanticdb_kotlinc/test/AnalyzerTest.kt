@@ -40,7 +40,8 @@ class AnalyzerTest {
                     pluginOptions =
                         listOf(
                             PluginOption("semanticdb-kotlinc", "sourceroot", path.toString()),
-                            PluginOption("semanticdb-kotlinc", "targetroot", buildPath.toString()))
+                            PluginOption("semanticdb-kotlinc", "targetroot", buildPath.toString())
+                        )
                     commandLineProcessors = listOf(AnalyzerCommandLineProcessor())
                     workingDir = path.toFile()
                 }
@@ -60,7 +61,8 @@ class AnalyzerTest {
             package sample
             class Banana {
                 fun foo() { }
-            }""")
+            }"""
+            )
 
         val occurrences =
             arrayOf(
@@ -137,7 +139,8 @@ class AnalyzerTest {
 
                     import kotlin.Boolean
                     import kotlin.Int as KInt
-                """)
+                """
+            )
 
         val occurrences =
             arrayOf(
@@ -210,7 +213,8 @@ class AnalyzerTest {
                         fun localClassMethod() {}
                       }
                     }
-                """)
+                """
+            )
 
         val occurrences =
             arrayOf(
@@ -327,7 +331,8 @@ class AnalyzerTest {
             class Class : Interface {
                 override fun foo() {}
             }
-            """)
+            """
+            )
 
         val occurrences =
             arrayOf(
@@ -468,7 +473,8 @@ class AnalyzerTest {
                     override fun foo() {}
                 }
             }
-            """)
+            """
+            )
 
         val occurrences =
             arrayOf(
@@ -661,7 +667,8 @@ class AnalyzerTest {
             package sample
 
             fun foo(arg: Int): Boolean = true
-            """)
+            """
+            )
 
         val occurrences =
             arrayOf(
@@ -725,7 +732,8 @@ class AnalyzerTest {
                     else -> x as Float
                 }
             }
-            """)
+            """
+            )
 
         val occurrences =
             arrayOf(
@@ -768,7 +776,8 @@ class AnalyzerTest {
                     pluginOptions =
                         listOf(
                             PluginOption("semanticdb-kotlinc", "sourceroot", path.toString()),
-                            PluginOption("semanticdb-kotlinc", "targetroot", buildPath.toString()))
+                            PluginOption("semanticdb-kotlinc", "targetroot", buildPath.toString())
+                        )
                     commandLineProcessors = listOf(AnalyzerCommandLineProcessor())
                     workingDir = path.toFile()
                 }
@@ -1194,7 +1203,8 @@ class AnalyzerTest {
                 counter1() // => The value of the counter is 36
                 println(-counter2) // => Counter(value=-5)
             }
-        """)
+        """
+            )
 
         val result =
             KotlinCompilation()
@@ -1205,7 +1215,8 @@ class AnalyzerTest {
                     pluginOptions =
                         listOf(
                             PluginOption("semanticdb-kotlinc", "sourceroot", path.toString()),
-                            PluginOption("semanticdb-kotlinc", "targetroot", buildPath.toString()))
+                            PluginOption("semanticdb-kotlinc", "targetroot", buildPath.toString())
+                        )
                     commandLineProcessors = listOf(AnalyzerCommandLineProcessor())
                     workingDir = path.toFile()
                 }
@@ -1398,7 +1409,8 @@ class AnalyzerTest {
                  *
                  **/
                inline fun docstrings(msg: String): Int { return msg.length }
-        """.trimIndent())
+        """.trimIndent()
+            )
         document.assertDocumentation("sample/Docstrings#", "Example class docstring")
         document.assertDocumentation("sample/docstrings().", "Example method docstring")
     }

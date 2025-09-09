@@ -2,27 +2,25 @@ package com.sourcegraph.semanticdb_kotlinc
 
 import java.nio.file.Path
 import kotlin.contracts.ExperimentalContracts
-import kotlin.math.exp
 import org.jetbrains.kotlin.*
 import org.jetbrains.kotlin.com.intellij.lang.LighterASTNode
 import org.jetbrains.kotlin.com.intellij.util.diff.FlyweightCapableTreeStructure
-import org.jetbrains.kotlin.diagnostics.*
+import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
+import org.jetbrains.kotlin.diagnostics.collectDescendantsOfType
+import org.jetbrains.kotlin.diagnostics.findChildByType
+import org.jetbrains.kotlin.diagnostics.findDescendantByType
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.analysis.checkers.MppCheckerKind
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.analysis.checkers.declaration.*
 import org.jetbrains.kotlin.fir.analysis.checkers.expression.ExpressionCheckers
-import org.jetbrains.kotlin.fir.analysis.checkers.expression.FirBasicExpressionChecker
-import org.jetbrains.kotlin.fir.analysis.checkers.expression.FirClassReferenceExpressionChecker
 import org.jetbrains.kotlin.fir.analysis.checkers.expression.FirQualifiedAccessExpressionChecker
 import org.jetbrains.kotlin.fir.analysis.checkers.expression.FirTypeOperatorCallChecker
 import org.jetbrains.kotlin.fir.analysis.checkers.getContainingClassSymbol
 import org.jetbrains.kotlin.fir.analysis.checkers.toClassLikeSymbol
 import org.jetbrains.kotlin.fir.analysis.extensions.FirAdditionalCheckersExtension
 import org.jetbrains.kotlin.fir.declarations.*
-import org.jetbrains.kotlin.fir.expressions.FirClassReferenceExpression
 import org.jetbrains.kotlin.fir.expressions.FirQualifiedAccessExpression
-import org.jetbrains.kotlin.fir.expressions.FirStatement
 import org.jetbrains.kotlin.fir.expressions.FirTypeOperatorCall
 import org.jetbrains.kotlin.fir.references.FirResolvedNamedReference
 import org.jetbrains.kotlin.fir.resolve.calls.FirSyntheticFunctionSymbol
@@ -30,8 +28,6 @@ import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
 import org.jetbrains.kotlin.fir.resolve.toClassLikeSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirAnonymousObjectSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
-import org.jetbrains.kotlin.fir.types.coneType
-import org.jetbrains.kotlin.fir.types.resolvedType
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
@@ -47,6 +43,7 @@ open class AnalyzerCheckers(session: FirSession) : FirAdditionalCheckersExtensio
                 .findChildByType(element.lighterASTNode, KtTokens.IDENTIFIER)
                 ?.toKtLightSourceElement(element.treeStructure) ?: element
     }
+
     override val declarationCheckers: DeclarationCheckers
         get() = AnalyzerDeclarationCheckers(session.analyzerParamsProvider.sourceroot)
 
@@ -54,7 +51,7 @@ open class AnalyzerCheckers(session: FirSession) : FirAdditionalCheckersExtensio
         get() =
             object : ExpressionCheckers() {
                 override val qualifiedAccessExpressionCheckers:
-                    Set<FirQualifiedAccessExpressionChecker> =
+                        Set<FirQualifiedAccessExpressionChecker> =
                     setOf(SemanticQualifiedAccessExpressionChecker())
 
                 override val typeOperatorCallCheckers:
@@ -85,7 +82,8 @@ open class AnalyzerCheckers(session: FirSession) : FirAdditionalCheckersExtensio
     private class SemanticFileChecker(private val sourceroot: Path) :
         FirFileChecker(MppCheckerKind.Common) {
         companion object {
-            @OptIn(ExperimentalContracts::class) val globals = GlobalSymbolsCache()
+            @OptIn(ExperimentalContracts::class)
+            val globals = GlobalSymbolsCache()
         }
 
         @OptIn(ExperimentalContracts::class)
@@ -106,34 +104,34 @@ open class AnalyzerCheckers(session: FirSession) : FirAdditionalCheckersExtensio
             val visitor = visitors[ktFile]
 
             val eachFqNameElement =
-                {
-                fqName: FqName,
-                tree: FlyweightCapableTreeStructure<LighterASTNode>,
-                names: LighterASTNode,
-                callback: (FqName, KtLightSourceElement) -> Unit ->
-                val nameList =
-                    if (names.tokenType == KtNodeTypes.REFERENCE_EXPRESSION) listOf(names)
-                    else tree.collectDescendantsOfType(names, KtNodeTypes.REFERENCE_EXPRESSION)
+                { fqName: FqName,
+                  tree: FlyweightCapableTreeStructure<LighterASTNode>,
+                  names: LighterASTNode,
+                  callback: (FqName, KtLightSourceElement) -> Unit ->
+                    val nameList =
+                        if (names.tokenType == KtNodeTypes.REFERENCE_EXPRESSION) listOf(names)
+                        else tree.collectDescendantsOfType(names, KtNodeTypes.REFERENCE_EXPRESSION)
 
-                var ancestor = fqName
-                var depth = 0
-                while (ancestor != FqName.ROOT) {
-                    val nameNode = nameList[nameList.lastIndex - depth]
-                    val nameSource = nameNode.toKtLightSourceElement(tree)
+                    var ancestor = fqName
+                    var depth = 0
+                    while (ancestor != FqName.ROOT) {
+                        val nameNode = nameList[nameList.lastIndex - depth]
+                        val nameSource = nameNode.toKtLightSourceElement(tree)
 
-                    callback(ancestor, nameSource)
+                        callback(ancestor, nameSource)
 
-                    ancestor = ancestor.parent()
-                    depth++
+                        ancestor = ancestor.parent()
+                        depth++
+                    }
                 }
-            }
 
             val packageDirective = declaration.packageDirective
             val fqName = packageDirective.packageFqName
             val source = packageDirective.source
             if (source != null) {
-                val names = source.treeStructure.findChildByType(source.lighterASTNode, KtNodeTypes.DOT_QUALIFIED_EXPRESSION) ?:
-                    source.treeStructure.findChildByType(source.lighterASTNode, KtNodeTypes.REFERENCE_EXPRESSION)
+                val names =
+                    source.treeStructure.findChildByType(source.lighterASTNode, KtNodeTypes.DOT_QUALIFIED_EXPRESSION)
+                        ?: source.treeStructure.findChildByType(source.lighterASTNode, KtNodeTypes.REFERENCE_EXPRESSION)
 
                 if (names != null) {
                     eachFqNameElement(fqName, source.treeStructure, names) { fqName, name ->
@@ -146,7 +144,10 @@ open class AnalyzerCheckers(session: FirSession) : FirAdditionalCheckersExtensio
                 val source = import.source ?: return@forEach
                 val fqName = import.importedFqName ?: return@forEach
 
-                val names = source.treeStructure.findDescendantByType(source.lighterASTNode, KtNodeTypes.DOT_QUALIFIED_EXPRESSION)
+                val names = source.treeStructure.findDescendantByType(
+                    source.lighterASTNode,
+                    KtNodeTypes.DOT_QUALIFIED_EXPRESSION
+                )
                 if (names != null) {
                     eachFqNameElement(fqName, source.treeStructure, names) { fqName, name ->
                         val symbolProvider = context.session.symbolProvider
@@ -155,7 +156,8 @@ open class AnalyzerCheckers(session: FirSession) : FirAdditionalCheckersExtensio
                             symbolProvider.getClassLikeSymbolByClassId(ClassId.topLevel(fqName))
                         val callables =
                             symbolProvider.getTopLevelCallableSymbols(
-                                fqName.parent(), fqName.shortName())
+                                fqName.parent(), fqName.shortName()
+                            )
 
                         if (klass != null) {
                             visitor?.visitClassReference(klass, name)
@@ -229,7 +231,10 @@ open class AnalyzerCheckers(session: FirSession) : FirAdditionalCheckersExtensio
                     null
                 }
 
-                visitor?.visitPrimaryConstructor(declaration, constructorKeyboard ?: objectKeyword ?: getIdentifier(klassSource))
+                visitor?.visitPrimaryConstructor(
+                    declaration,
+                    constructorKeyboard ?: objectKeyword ?: getIdentifier(klassSource)
+                )
             } else {
                 visitor?.visitSecondaryConstructor(declaration, getIdentifier(source))
             }

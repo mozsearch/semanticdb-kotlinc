@@ -1,4 +1,3 @@
-
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -131,14 +130,18 @@ subprojects {
         }
 
         dependencies {
-            semanticdbJar(project(mapOf(
-                "path" to projects.semanticdbKotlinc.dependencyProject.path,
-                "configuration" to "semanticdbJar"
-            )))
+            semanticdbJar(
+                project(
+                    mapOf(
+                        "path" to projects.semanticdbKotlinc.dependencyProject.path,
+                        "configuration" to "semanticdbJar"
+                    )
+                )
+            )
         }
 
         val sourceroot = rootDir.path
-        val targetroot = project.buildDir.resolve( "semanticdb-targetroot")
+        val targetroot = project.buildDir.resolve("semanticdb-targetroot")
 
         tasks.withType<KotlinCompile> {
             dependsOn(projects.semanticdbKotlinc.dependencyProject.tasks.shadowJar.get().path)
@@ -193,7 +196,8 @@ subprojects {
             systemProperties = mapOf(
                 "sourceroot" to sourceroot,
                 "targetroot" to project.buildDir.resolve("semanticdb-targetroot"),
-                "snapshotDir" to generatedSnapshots.resources.srcDirs.first())
+                "snapshotDir" to generatedSnapshots.resources.srcDirs.first()
+            )
         }
     }
 }

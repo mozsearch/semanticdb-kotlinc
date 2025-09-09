@@ -28,8 +28,8 @@ class GlobalSymbolsCache(testing: Boolean = false) : Iterable<Symbol> {
 
     operator fun get(symbol: FirBasedSymbol<*>, locals: LocalSymbolsCache): Sequence<Symbol> =
         sequence {
-        emitSymbols(symbol, locals)
-    }
+            emitSymbols(symbol, locals)
+        }
 
     operator fun get(symbol: FqName): Sequence<Symbol> = sequence { emitSymbols(symbol) }
 
@@ -71,6 +71,7 @@ class GlobalSymbolsCache(testing: Boolean = false) : Iterable<Symbol> {
             if (it.isGlobal()) globals[symbol] = it
         }
     }
+
     private fun getSymbol(symbol: FqName): Symbol {
         packages[symbol]?.let {
             return it
@@ -106,7 +107,8 @@ class GlobalSymbolsCache(testing: Boolean = false) : Iterable<Symbol> {
 
         val owner = this.getSymbol(symbol.parent())
         return Symbol.createGlobal(
-            owner, SemanticdbSymbolDescriptor(Kind.PACKAGE, symbol.shortName().asString()))
+            owner, SemanticdbSymbolDescriptor(Kind.PACKAGE, symbol.shortName().asString())
+        )
     }
 
     /**
@@ -121,6 +123,7 @@ class GlobalSymbolsCache(testing: Boolean = false) : Iterable<Symbol> {
         when (symbol) {
             is FirTypeParameterSymbol ->
                 return getSymbol(symbol.containingDeclarationSymbol, locals)
+
             is FirValueParameterSymbol -> return getSymbol(symbol.containingDeclarationSymbol, locals)
             is FirPropertyAccessorSymbol -> return getSymbol(symbol.propertySymbol, locals)
             is FirCallableSymbol -> {
@@ -128,14 +131,17 @@ class GlobalSymbolsCache(testing: Boolean = false) : Iterable<Symbol> {
                 return symbol.getContainingSymbol(session)?.let { getSymbol(it, locals) }
                     ?: getSymbol(symbol.packageFqName())
             }
+
             is FirClassLikeSymbol -> {
                 val session = symbol.fir.moduleData.session
                 return symbol.getContainingDeclaration(session)?.let { getSymbol(it, locals) }
                     ?: getSymbol(symbol.packageFqName())
             }
+
             is FirFileSymbol -> {
                 return getSymbol(symbol.fir.packageFqName)
             }
+
             else -> return Symbol.NONE
         }
     }
@@ -147,23 +153,33 @@ class GlobalSymbolsCache(testing: Boolean = false) : Iterable<Symbol> {
                 symbol.source?.let { source ->
                     SemanticdbSymbolDescriptor(Kind.TYPE, "<anonymous object at ${source.startOffset}>")
                 } ?: SemanticdbSymbolDescriptor.NONE
+
             symbol is FirClassLikeSymbol ->
                 SemanticdbSymbolDescriptor(Kind.TYPE, symbol.classId.shortClassName.asString())
+
             symbol is FirPropertyAccessorSymbol && symbol.isSetter ->
                 SemanticdbSymbolDescriptor(Kind.METHOD, "set")
+
             symbol is FirPropertyAccessorSymbol && symbol.isGetter ->
                 SemanticdbSymbolDescriptor(Kind.METHOD, "get")
+
             symbol is FirConstructorSymbol ->
                 SemanticdbSymbolDescriptor(Kind.METHOD, "<init>", methodDisambiguator(symbol))
+
             symbol is FirFunctionSymbol ->
                 SemanticdbSymbolDescriptor(
-                    Kind.METHOD, symbol.name.toString(), methodDisambiguator(symbol))
+                    Kind.METHOD, symbol.name.toString(), methodDisambiguator(symbol)
+                )
+
             symbol is FirTypeParameterSymbol ->
                 SemanticdbSymbolDescriptor(Kind.TYPE_PARAMETER, symbol.name.toString())
+
             symbol is FirValueParameterSymbol ->
                 SemanticdbSymbolDescriptor(Kind.PARAMETER, symbol.name.toString())
+
             symbol is FirVariableSymbol ->
                 SemanticdbSymbolDescriptor(Kind.TERM, symbol.name.toString())
+
             symbol is FirFileSymbol -> SemanticdbSymbolDescriptor.NONE
             else -> {
                 err.println("unknown symbol kind ${symbol.javaClass.simpleName}")
@@ -180,10 +196,13 @@ class GlobalSymbolsCache(testing: Boolean = false) : Iterable<Symbol> {
             when (val containingSymbol = symbol.getContainingSymbol(session)) {
                 is FirClassSymbol ->
                     (containingSymbol.fir as FirClass).declarations.map { it.symbol }
+
                 is FirFileSymbol -> containingSymbol.fir.declarations.map { it.symbol }
                 null ->
                     symbol.moduleData.session.symbolProvider.getTopLevelCallableSymbols(
-                        symbol.packageFqName(), symbol.name)
+                        symbol.packageFqName(), symbol.name
+                    )
+
                 else -> return "()"
             }
 
