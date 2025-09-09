@@ -38,6 +38,7 @@ class PostAnalysisExtension(
         } catch (e: Exception) {
             handleException(e)
         }
+        AnalyzerCheckers.visitors.clear()
     }
 
     private fun semanticdbOutPathForFile(file: KtSourceFile): Path? {
