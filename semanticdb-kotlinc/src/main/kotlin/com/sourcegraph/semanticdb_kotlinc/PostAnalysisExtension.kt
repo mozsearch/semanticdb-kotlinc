@@ -56,7 +56,8 @@ class PostAnalysisExtension(
             return semanticdbOutPath
         }
         System.err.println(
-            "given file is not under the sourceroot.\n\tSourceroot: $sourceRoot\n\tFile path: ${file.path}\n\tNormalized file path: $normalizedPath")
+            "given file is not under the sourceroot.\n\tSourceroot: $sourceRoot\n\tFile path: ${file.path}\n\tNormalized file path: $normalizedPath"
+        )
         return null
     }
 
@@ -64,7 +65,8 @@ class PostAnalysisExtension(
         CompilerConfiguration()
             .get(
                 CommonConfigurationKeys.MESSAGE_COLLECTOR_KEY,
-                PrintingMessageCollector(System.err, MessageRenderer.PLAIN_FULL_PATHS, false))
+                PrintingMessageCollector(System.err, MessageRenderer.PLAIN_FULL_PATHS, false)
+            )
 
     private fun handleException(e: Exception) {
         val writer =
@@ -79,11 +81,13 @@ class PostAnalysisExtension(
                         buf.append(data, offset, len)
                     }
                 },
-                false)
+                false
+            )
         writer.println("Exception in semanticdb-kotlin compiler plugin:")
         e.printStackTrace(writer)
         writer.println(
-            "Please report a bug to https://github.com/sourcegraph/lsif-kotlin with the stack trace above.")
+            "Please report a bug to https://github.com/sourcegraph/lsif-kotlin with the stack trace above."
+        )
         writer.close()
     }
 }

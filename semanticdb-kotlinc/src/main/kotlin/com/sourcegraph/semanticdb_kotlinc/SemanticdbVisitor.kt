@@ -39,8 +39,8 @@ class SemanticdbVisitor(
         role: Role,
     ): List<Symbol>? =
         this?.onEach { (firBasedSymbol, symbol) ->
-                documentBuilder.emitSemanticdbData(firBasedSymbol, symbol, element, role)
-            }
+            documentBuilder.emitSemanticdbData(firBasedSymbol, symbol, element, role)
+        }
             ?.map { it.symbol }
             ?.toList()
 

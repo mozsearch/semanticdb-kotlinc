@@ -19,7 +19,9 @@ class AnalyzerRegistrar(private val callback: (Semanticdb.TextDocument) -> Unit 
             PostAnalysisExtension(
                 sourceRoot = configuration[KEY_SOURCES]!!,
                 targetRoot = configuration[KEY_TARGET]!!,
-                callback = callback))
+                callback = callback
+            )
+        )
     }
 
     override val supportsK2: Boolean
