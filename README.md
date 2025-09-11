@@ -26,6 +26,7 @@ semanticdb-kotlinc that matches the Kotlin version you are using in your project
 | 1.9.x          | 0.4.0                      |
 | 2.1.20         | 0.5.0                      |
 | 2.2.0          | 0.6.0                      |
+| 2.2.20         | 0.7.0                      |
 
 The default `main` branch targets the next Kotlin release. The `kotlin-x.y.z`
 branches target the relevant Kotlin version. Bugfixes and improvements will only
