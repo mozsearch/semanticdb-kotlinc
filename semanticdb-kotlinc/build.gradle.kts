@@ -1,5 +1,4 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm")
@@ -25,10 +24,6 @@ dependencies {
     // Until then, we use the fork from https://github.com/ZacSweers/kotlin-compile-testing instead.
     // testImplementation("com.github.tschuchortdev", "kotlin-compile-testing", "1.5.0")
     testImplementation("dev.zacsweers.kctfork", "core", "0.7.1")
-}
-
-tasks.withType<KotlinCompile> {
-    dependsOn(":${projects.semanticdbKotlin.name}:build")
 }
 
 kotlin {
