@@ -45,18 +45,6 @@ tasks.jar {
     }
 }
 
-val sourceJar = task<Jar>("sourceJar") {
-    dependsOn(tasks.classes)
-    archiveClassifier.set("sources")
-    from(sourceSets.main.get().allSource)
-}
-
-val javadocJar = task<Jar>("javadocJar") {
-    dependsOn(tasks.javadoc)
-    archiveClassifier.set("javadoc")
-    from(tasks.javadoc.get().destinationDir)
-}
-
 tasks.test {
     useJUnitPlatform()
     testLogging {
