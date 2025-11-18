@@ -22,7 +22,6 @@ buildscript {
 dependencies {
     implementation(kotlin("stdlib"))
     implementation("com.google.protobuf:protobuf-java:3.17.3")
-    compileOnly("com.sourcegraph", "semanticdb-javac", "0.8.23")
 }
 
 
@@ -33,14 +32,6 @@ afterEvaluate {
 
     tasks.compileKotlin {
         dependsOn(tasks.getByName("generateProto"))
-    }
-
-    tasks.withType<JavaCompile> {
-        val sourceroot = rootDir.path
-        val targetroot = this.project.buildDir.resolve( "semanticdb-targetroot")
-        options.compilerArgs = options.compilerArgs + listOf(
-            "-Xplugin:semanticdb -sourceroot:$sourceroot -targetroot:$targetroot"
-        )
     }
 }
 
