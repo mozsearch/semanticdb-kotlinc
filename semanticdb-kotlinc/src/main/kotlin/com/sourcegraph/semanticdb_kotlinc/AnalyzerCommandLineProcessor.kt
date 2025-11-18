@@ -15,9 +15,11 @@ val KEY_SOURCES = CompilerConfigurationKey<Path>(VAL_SOURCES)
 const val VAL_TARGET = "targetroot"
 val KEY_TARGET = CompilerConfigurationKey<Path>(VAL_TARGET)
 
+const val PLUGIN_ID = "semanticdb-kotlinc"
+
 @OptIn(ExperimentalCompilerApi::class)
 class AnalyzerCommandLineProcessor : CommandLineProcessor {
-    override val pluginId: String = "semanticdb-kotlinc"
+    override val pluginId: String = PLUGIN_ID
     override val pluginOptions: Collection<AbstractCliOption> =
         listOf(
             CliOption(

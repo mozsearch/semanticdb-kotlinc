@@ -24,6 +24,8 @@ class AnalyzerRegistrar(private val callback: (Semanticdb.TextDocument) -> Unit 
         )
     }
 
+    override val pluginId = PLUGIN_ID
+
     override val supportsK2: Boolean
         get() = true
 }
