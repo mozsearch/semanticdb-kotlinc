@@ -2,6 +2,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
     kotlin("jvm")
+    id("com.gradleup.shadow")
 }
 
 repositories {
@@ -29,6 +30,15 @@ kotlin {
     }
 }
 
+val semanticdbJar: Configuration by configurations.creating {
+    isCanBeConsumed = true
+    isCanBeResolved = false
+}
+
+artifacts {
+    add(semanticdbJar.name, tasks.shadowJar)
+}
+
 tasks.jar {
     archiveClassifier.set("slim")
     manifest {
@@ -37,6 +47,12 @@ tasks.jar {
         attributes["Implementation-Title"] = "semanticdb-kotlinc"
         attributes["Implementation-Version"] = project.version
     }
+}
+
+tasks.shadowJar {
+    archiveClassifier.set("")
+    relocate("com.intellij", "org.jetbrains.kotlin.com.intellij")
+    minimize()
 }
 
 tasks.test {
