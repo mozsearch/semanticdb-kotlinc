@@ -12,7 +12,7 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib"))
     compileOnly(kotlin("compiler-embeddable"))
-    implementation("com.google.protobuf:protobuf-java:4.33.1")
+    implementation("com.google.protobuf:protobuf-java:4.33.2")
     implementation(projects.semanticdbKotlin)
 
     testImplementation(kotlin("compiler-embeddable"))
