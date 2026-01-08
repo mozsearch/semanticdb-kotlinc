@@ -18,7 +18,7 @@ dependencies {
     testImplementation(kotlin("compiler-embeddable"))
     testImplementation(kotlin("test"))
     testImplementation("io.kotest:kotest-assertions-core:6.0.5")
-    testImplementation("dev.zacsweers.kctfork:core:0.12.0")
+    testImplementation("dev.zacsweers.kctfork:core:0.12.1")
 }
 
 kotlin {
