@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm")
-    id("com.google.protobuf") version "0.9.5"
+    id("com.google.protobuf") version "0.9.6"
 }
 
 repositories {
@@ -13,13 +13,13 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.google.protobuf:protobuf-java:4.33.1")
+        classpath("com.google.protobuf:protobuf-java:4.33.2")
     }
 }
 
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation("com.google.protobuf:protobuf-java:4.33.1")
+    implementation("com.google.protobuf:protobuf-java:4.33.2")
 }
 
 
@@ -36,7 +36,7 @@ afterEvaluate {
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:4.33.1"
+        artifact = "com.google.protobuf:protoc:4.33.2"
     }
 
     plugins {
