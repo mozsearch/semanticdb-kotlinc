@@ -1,0 +1,18 @@
+[versions]
+google-protobuf-plugin = "0.9.6"
+kctfork = "0.12.1"
+kotlin = "2.3.0"
+kotest = "6.0.7"
+protobuf = "4.33.2"
+shadow = "9.3.1"
+
+[libraries]
+kctfork-core = { module = "dev.zacsweers.kctfork:core", version.ref = "kctfork" }
+kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
+protobuf-java = { module = "com.google.protobuf:protobuf-java", version.ref = "protobuf" }
+protobuf-protoc = { module = "com.google.protobuf:protoc", version.ref = "protobuf" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+protobuf = { id = "com.google.protobuf", version.ref = "google-protobuf-plugin" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
