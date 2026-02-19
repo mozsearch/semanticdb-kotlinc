@@ -1,25 +1,15 @@
 plugins {
-    kotlin("jvm")
-    id("com.google.protobuf") version "0.9.6"
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.protobuf)
 }
 
 repositories {
     mavenCentral()
 }
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath("com.google.protobuf:protobuf-java:4.33.2")
-    }
-}
-
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation("com.google.protobuf:protobuf-java:4.33.2")
+    implementation(libs.protobuf.java)
 }
 
 
@@ -36,7 +26,7 @@ afterEvaluate {
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:4.33.2"
+        artifact = libs.protobuf.protoc.get().toString()
     }
 
     plugins {

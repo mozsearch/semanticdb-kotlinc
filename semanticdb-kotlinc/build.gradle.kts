@@ -1,8 +1,8 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
-    kotlin("jvm")
-    id("com.gradleup.shadow")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.shadow)
 }
 
 repositories {
@@ -12,13 +12,13 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib"))
     compileOnly(kotlin("compiler-embeddable"))
-    implementation("com.google.protobuf:protobuf-java:4.33.2")
+    implementation(libs.protobuf.java)
     implementation(projects.semanticdbKotlin)
 
     testImplementation(kotlin("compiler-embeddable"))
     testImplementation(kotlin("test"))
-    testImplementation("io.kotest:kotest-assertions-core:6.0.7")
-    testImplementation("dev.zacsweers.kctfork:core:0.12.1")
+    testImplementation(libs.kotest.assertions.core)
+    testImplementation(libs.kctfork.core)
 }
 
 kotlin {
