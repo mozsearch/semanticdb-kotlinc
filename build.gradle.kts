@@ -3,15 +3,11 @@ plugins {
     alias(libs.plugins.shadow)
 }
 
-repositories {
-    mavenCentral()
-}
-
 subprojects {
     afterEvaluate {
         java {
             toolchain {
-                languageVersion.set(JavaLanguageVersion.of(17))
+                languageVersion = JavaLanguageVersion.of(17)
             }
         }
     }
