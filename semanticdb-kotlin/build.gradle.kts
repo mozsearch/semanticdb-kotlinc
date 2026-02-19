@@ -3,24 +3,17 @@ plugins {
     alias(libs.plugins.protobuf)
 }
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     implementation(kotlin("stdlib"))
     implementation(libs.protobuf.java)
 }
 
+tasks.processResources {
+    dependsOn(tasks.named("generateProto"))
+}
 
-afterEvaluate {
-    tasks.processResources {
-        dependsOn(tasks.getByName("generateProto"))
-    }
-
-    tasks.compileKotlin {
-        dependsOn(tasks.getByName("generateProto"))
-    }
+tasks.compileKotlin {
+    dependsOn(tasks.named("generateProto"))
 }
 
 

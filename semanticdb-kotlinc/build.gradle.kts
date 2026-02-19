@@ -5,10 +5,6 @@ plugins {
     alias(libs.plugins.shadow)
 }
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     implementation(kotlin("stdlib"))
     compileOnly(kotlin("compiler-embeddable"))
@@ -40,7 +36,7 @@ artifacts {
 }
 
 tasks.jar {
-    archiveClassifier.set("slim")
+    archiveClassifier = "slim"
     manifest {
         attributes["Specification-Title"] = project.name
         attributes["Specification-Version"] = project.version
@@ -50,7 +46,7 @@ tasks.jar {
 }
 
 tasks.shadowJar {
-    archiveClassifier.set("")
+    archiveClassifier = ""
     relocate("com.intellij", "org.jetbrains.kotlin.com.intellij")
     minimize()
 }

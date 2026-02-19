@@ -1,5 +1,11 @@
 rootProject.name = "lsif-kotlin"
 
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+    }
+}
+
 include(
     "semanticdb-kotlin",
     "semanticdb-kotlinc",
