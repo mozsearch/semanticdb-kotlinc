@@ -1,9 +1,9 @@
 [versions]
 google-protobuf-plugin = "0.9.6"
 kctfork = "0.12.1"
-kotlin = "2.3.0"
-kotest = "6.0.7"
-protobuf = "4.33.2"
+kotlin = "2.3.10"
+kotest = "6.1.3"
+protobuf = "4.33.5"
 shadow = "9.3.1"
 
 [libraries]
