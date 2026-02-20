@@ -317,6 +317,132 @@ class AnalyzerTest {
     }
 
     @Test
+    fun `local functions`(@TempDir path: Path) {
+        val document =
+            compileSemanticdb(
+                path,
+                """
+                    package sample
+
+                    fun outer() {
+                        fun inner() {}
+                        fun innerWithReturnType(): Int = 42
+                        inner()
+                    }
+                """
+            )
+
+        val occurrences =
+            arrayOf(
+                SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "sample/outer()."
+                    range { startLine = 2; startCharacter = 4; endLine = 2; endCharacter = 9 }
+                },
+                // inner() — local named function gets a local symbol
+                SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "local0"
+                    range { startLine = 3; startCharacter = 8; endLine = 3; endCharacter = 13 }
+                },
+                // innerWithReturnType() — local named function with explicit return type
+                SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "local1"
+                    range { startLine = 4; startCharacter = 8; endLine = 4; endCharacter = 27 }
+                },
+                // Int return-type reference
+                SymbolOccurrence {
+                    role = Role.REFERENCE
+                    symbol = "kotlin/Int#"
+                    range { startLine = 4; startCharacter = 31; endLine = 4; endCharacter = 34 }
+                },
+                // call site inner() references the same local symbol
+                SymbolOccurrence {
+                    role = Role.REFERENCE
+                    symbol = "local0"
+                    range { startLine = 5; startCharacter = 4; endLine = 5; endCharacter = 9 }
+                },
+            )
+        assertSoftly(document.occurrencesList) {
+            withClue(this) { occurrences.forEach(::shouldContain) }
+        }
+
+        val symbols =
+            arrayOf(
+                SymbolInformation {
+                    symbol = "local0"
+                    kind = Kind.METHOD
+                    enclosingSymbol = "sample/outer()."
+                    displayName = "inner"
+                    language = KOTLIN
+                    documentation {
+                        message = "```kotlin\nlocal final fun inner(): Unit\n```"
+                        format = Semanticdb.Documentation.Format.MARKDOWN
+                    }
+                },
+                SymbolInformation {
+                    symbol = "local1"
+                    kind = Kind.METHOD
+                    enclosingSymbol = "sample/outer()."
+                    displayName = "innerWithReturnType"
+                    language = KOTLIN
+                    documentation {
+                        message = "```kotlin\nlocal final fun innerWithReturnType(): Int\n```"
+                        format = Semanticdb.Documentation.Format.MARKDOWN
+                    }
+                },
+            )
+        assertSoftly(document.symbolsList) { withClue(this) { symbols.forEach(::shouldContain) } }
+    }
+
+    @Test
+    fun `user-defined class as return type`(@TempDir path: Path) {
+        val document =
+            compileSemanticdb(
+                path,
+                """
+                    package sample
+
+                    class MyClass
+
+                    fun bar(): MyClass = MyClass()
+                """
+            )
+
+        assertSoftly(document.occurrencesList) {
+            withClue(this) {
+                shouldContain(SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "sample/bar()."
+                    range { startLine = 4; startCharacter = 4; endLine = 4; endCharacter = 7 }
+                })
+                // MyClass in the return type position generates a class reference
+                shouldContain(SymbolOccurrence {
+                    role = Role.REFERENCE
+                    symbol = "sample/MyClass#"
+                    range { startLine = 4; startCharacter = 11; endLine = 4; endCharacter = 18 }
+                })
+            }
+        }
+
+        val symbols =
+            arrayOf(
+                SymbolInformation {
+                    symbol = "sample/bar()."
+                    kind = Kind.METHOD
+                    enclosingSymbol = "sample/"
+                    displayName = "bar"
+                    language = KOTLIN
+                    documentation {
+                        message = "```kotlin\npublic final fun bar(): MyClass\n```"
+                        format = Semanticdb.Documentation.Format.MARKDOWN
+                    }
+                })
+        assertSoftly(document.symbolsList) { withClue(this) { symbols.forEach(::shouldContain) } }
+    }
+
+    @Test
     fun overrides(@TempDir path: Path) {
         val document =
             compileSemanticdb(
