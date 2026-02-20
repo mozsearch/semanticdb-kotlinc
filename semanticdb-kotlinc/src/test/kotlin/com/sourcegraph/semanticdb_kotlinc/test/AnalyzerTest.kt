@@ -1036,6 +1036,13 @@ class AnalyzerTest {
                     else -> x as Float
                 }
             }
+
+            class Wrapper
+            fun classify(x: Any) {
+                if (x is Wrapper) {}
+                val s = x as? String
+                val w = x as Wrapper
+            }
             """
             )
 
@@ -1059,6 +1066,36 @@ class AnalyzerTest {
                         startCharacter = 21
                         endLine = 5
                         endCharacter = 26
+                    }
+                },
+                SymbolOccurrence {
+                    role = Role.REFERENCE
+                    symbol = "sample/Wrapper#"
+                    range {
+                        startLine = 11
+                        startCharacter = 13
+                        endLine = 11
+                        endCharacter = 20
+                    }
+                },
+                SymbolOccurrence {
+                    role = Role.REFERENCE
+                    symbol = "kotlin/String#"
+                    range {
+                        startLine = 12
+                        startCharacter = 18
+                        endLine = 12
+                        endCharacter = 24
+                    }
+                },
+                SymbolOccurrence {
+                    role = Role.REFERENCE
+                    symbol = "sample/Wrapper#"
+                    range {
+                        startLine = 13
+                        startCharacter = 17
+                        endLine = 13
+                        endCharacter = 24
                     }
                 },
             )
@@ -2276,6 +2313,162 @@ class AnalyzerTest {
                         Documentation {
                             format = Semanticdb.Documentation.Format.MARKDOWN
                             message = "```kotlin\npublic final fun greet(name: String): String\n```"
+                        }
+                })
+            }
+        }
+    }
+
+    @Test
+    fun `multiple supertype references`(@TempDir path: Path) {
+        val document =
+            compileSemanticdb(
+                path,
+                """
+                    package sample
+
+                    interface Named
+                    interface Speakable
+                    class Person : Named, Speakable
+                    fun use(p: Person): Named = p
+                """
+            )
+
+        assertSoftly(document.occurrencesList) {
+            withClue(this) {
+                shouldContain(SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "sample/Person#"
+                    range { startLine = 4; startCharacter = 6; endLine = 4; endCharacter = 12 }
+                })
+                shouldContain(SymbolOccurrence {
+                    role = Role.REFERENCE
+                    symbol = "sample/Named#"
+                    range { startLine = 4; startCharacter = 15; endLine = 4; endCharacter = 20 }
+                })
+                shouldContain(SymbolOccurrence {
+                    role = Role.REFERENCE
+                    symbol = "sample/Speakable#"
+                    range { startLine = 4; startCharacter = 22; endLine = 4; endCharacter = 31 }
+                })
+                shouldContain(SymbolOccurrence {
+                    role = Role.REFERENCE
+                    symbol = "sample/Named#"
+                    range { startLine = 5; startCharacter = 20; endLine = 5; endCharacter = 25 }
+                })
+            }
+        }
+
+        assertSoftly(document.symbolsList) {
+            withClue(this) {
+                shouldContain(SymbolInformation {
+                    symbol = "sample/Person#"
+                    kind = Kind.CLASS
+                    enclosingSymbol = "sample/"
+                    displayName = "Person"
+                    language = KOTLIN
+                    addOverriddenSymbols("sample/Named#")
+                    addOverriddenSymbols("sample/Speakable#")
+                    documentation =
+                        Documentation {
+                            format = Semanticdb.Documentation.Format.MARKDOWN
+                            message = "```kotlin\npublic final class Person : Named, Speakable\n```"
+                        }
+                })
+            }
+        }
+    }
+
+    @Test
+    fun `three-way overload disambiguator`(@TempDir path: Path) {
+        val document =
+            compileSemanticdb(
+                path,
+                """
+                    package sample
+
+                    fun add(x: Int, y: Int): Int = x + y
+                    fun add(x: Double, y: Double): Double = x + y
+                    fun add(x: String, y: String): String = x + y
+                    fun use() {
+                        add(1, 2)
+                        add(1.0, 2.0)
+                        add("a", "b")
+                    }
+                """
+            )
+
+        assertSoftly(document.occurrencesList) {
+            withClue(this) {
+                shouldContain(SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "sample/add()."
+                    range { startLine = 2; startCharacter = 4; endLine = 2; endCharacter = 7 }
+                })
+                shouldContain(SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "sample/add(+1)."
+                    range { startLine = 3; startCharacter = 4; endLine = 3; endCharacter = 7 }
+                })
+                shouldContain(SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "sample/add(+2)."
+                    range { startLine = 4; startCharacter = 4; endLine = 4; endCharacter = 7 }
+                })
+                shouldContain(SymbolOccurrence {
+                    role = Role.REFERENCE
+                    symbol = "sample/add()."
+                    range { startLine = 6; startCharacter = 4; endLine = 6; endCharacter = 7 }
+                })
+                shouldContain(SymbolOccurrence {
+                    role = Role.REFERENCE
+                    symbol = "sample/add(+1)."
+                    range { startLine = 7; startCharacter = 4; endLine = 7; endCharacter = 7 }
+                })
+                shouldContain(SymbolOccurrence {
+                    role = Role.REFERENCE
+                    symbol = "sample/add(+2)."
+                    range { startLine = 8; startCharacter = 4; endLine = 8; endCharacter = 7 }
+                })
+            }
+        }
+
+        assertSoftly(document.symbolsList) {
+            withClue(this) {
+                shouldContain(SymbolInformation {
+                    symbol = "sample/add()."
+                    kind = Kind.METHOD
+                    enclosingSymbol = "sample/"
+                    displayName = "add"
+                    language = KOTLIN
+                    documentation =
+                        Documentation {
+                            format = Semanticdb.Documentation.Format.MARKDOWN
+                            message = "```kotlin\npublic final fun add(x: Int, y: Int): Int\n```"
+                        }
+                })
+                shouldContain(SymbolInformation {
+                    symbol = "sample/add(+1)."
+                    kind = Kind.METHOD
+                    enclosingSymbol = "sample/"
+                    displayName = "add"
+                    language = KOTLIN
+                    documentation =
+                        Documentation {
+                            format = Semanticdb.Documentation.Format.MARKDOWN
+                            message = "```kotlin\npublic final fun add(x: Double, y: Double): Double\n```"
+                        }
+                })
+                shouldContain(SymbolInformation {
+                    symbol = "sample/add(+2)."
+                    kind = Kind.METHOD
+                    enclosingSymbol = "sample/"
+                    displayName = "add"
+                    language = KOTLIN
+                    documentation =
+                        Documentation {
+                            format = Semanticdb.Documentation.Format.MARKDOWN
+                            message = "```kotlin\npublic final fun add(x: String, y: String): String\n```"
                         }
                 })
             }
