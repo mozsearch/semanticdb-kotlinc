@@ -20,7 +20,6 @@ dependencies {
 kotlin {
     compilerOptions {
         freeCompilerArgs.addAll(
-            "-Xinline-classes",
             "-Xcontext-parameters",
         )
     }
