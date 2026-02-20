@@ -177,6 +177,7 @@ class SemanticdbTextDocumentBuilder(
             is FirValueParameter -> Kind.PARAMETER
             is FirField -> Kind.FIELD
             is FirProperty -> Kind.FIELD
+            is FirEnumEntry -> Kind.FIELD
             is FirVariable -> Kind.LOCAL
             is FirCallableDeclaration -> Kind.METHOD
             is FirPackageDirective -> Kind.PACKAGE
