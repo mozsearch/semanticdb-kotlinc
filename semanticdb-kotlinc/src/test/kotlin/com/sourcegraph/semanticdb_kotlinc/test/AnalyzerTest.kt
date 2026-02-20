@@ -443,6 +443,99 @@ class AnalyzerTest {
     }
 
     @Test
+    fun `typealias`(@TempDir path: Path) {
+        val document =
+            compileSemanticdb(
+                path,
+                """
+                    package sample
+
+                    typealias MyAlias = Int
+                    val x: MyAlias = 42
+                """
+            )
+
+        assertSoftly(document.occurrencesList) {
+            withClue(this) {
+                shouldContain(SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "sample/MyAlias#"
+                    range { startLine = 2; startCharacter = 10; endLine = 2; endCharacter = 17 }
+                })
+                // Note: val x: MyAlias does not emit a REFERENCE for sample/MyAlias# because the
+                // property checker resolves the type alias to its expansion (Int).
+                shouldContain(SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "sample/x."
+                    range { startLine = 3; startCharacter = 4; endLine = 3; endCharacter = 5 }
+                })
+            }
+        }
+
+        val symbols =
+            arrayOf(
+                SymbolInformation {
+                    symbol = "sample/MyAlias#"
+                    kind = Kind.CLASS
+                    enclosingSymbol = "sample/"
+                    displayName = "MyAlias"
+                    language = KOTLIN
+                    documentation {
+                        message = "```kotlin\npublic final typealias MyAlias = Int\n\n```"
+                        format = Semanticdb.Documentation.Format.MARKDOWN
+                    }
+                })
+        assertSoftly(document.symbolsList) { withClue(this) { symbols.forEach(::shouldContain) } }
+    }
+
+    @Test
+    fun `type parameters`(@TempDir path: Path) {
+        val document =
+            compileSemanticdb(
+                path,
+                """
+                    package sample
+
+                    fun <T> identity(x: T): T = x
+                """
+            )
+
+        assertSoftly(document.occurrencesList) {
+            withClue(this) {
+                shouldContain(SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "sample/identity()."
+                    range { startLine = 2; startCharacter = 8; endLine = 2; endCharacter = 16 }
+                })
+                shouldContain(SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "sample/identity().[T]"
+                    range { startLine = 2; startCharacter = 5; endLine = 2; endCharacter = 6 }
+                })
+                // Note: T in type-annotation positions (x: T and return type : T) does not produce
+                // REFERENCE occurrences. The checkers use toClassLikeSymbol() to detect type
+                // references, which returns null for type parameters, so those usages are not
+                // currently tracked.
+            }
+        }
+
+        val symbols =
+            arrayOf(
+                SymbolInformation {
+                    symbol = "sample/identity().[T]"
+                    kind = Kind.TYPE_PARAMETER
+                    enclosingSymbol = "sample/identity()."
+                    displayName = "T"
+                    language = KOTLIN
+                    documentation {
+                        message = "```kotlin\nT\n```"
+                        format = Semanticdb.Documentation.Format.MARKDOWN
+                    }
+                })
+        assertSoftly(document.symbolsList) { withClue(this) { symbols.forEach(::shouldContain) } }
+    }
+
+    @Test
     fun overrides(@TempDir path: Path) {
         val document =
             compileSemanticdb(
