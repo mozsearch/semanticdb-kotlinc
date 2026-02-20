@@ -90,6 +90,8 @@ message SymbolInformation {
     PACKAGE = 11;
     CLASS = 13;
     INTERFACE = 18;
+    ENUM_MEMBER = 22;
+    TYPE_ALIAS = 23;
   }
   enum Property {
     UNKNOWN_PROPERTY = 0;

@@ -171,12 +171,14 @@ class SemanticdbTextDocumentBuilder(
     private fun semanticdbKind(element: FirElement?): Kind =
         when (element) {
             is FirClass if element.isInterface -> Kind.INTERFACE
+            is FirTypeAlias -> Kind.TYPE_ALIAS
             is FirClassLikeDeclaration -> Kind.CLASS
             is FirConstructor -> Kind.CONSTRUCTOR
             is FirTypeParameter -> Kind.TYPE_PARAMETER
             is FirValueParameter -> Kind.PARAMETER
             is FirField -> Kind.FIELD
             is FirProperty -> Kind.FIELD
+            is FirEnumEntry -> Kind.ENUM_MEMBER
             is FirVariable -> Kind.LOCAL
             is FirCallableDeclaration -> Kind.METHOD
             is FirPackageDirective -> Kind.PACKAGE
