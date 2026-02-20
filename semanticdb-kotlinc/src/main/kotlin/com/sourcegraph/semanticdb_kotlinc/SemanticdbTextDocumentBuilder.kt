@@ -138,11 +138,12 @@ class SemanticdbTextDocumentBuilder(
     @OptIn(SymbolInternals::class, RenderingInternals::class)
     private fun displayName(firBasedSymbol: FirBasedSymbol<*>): String =
         when (firBasedSymbol) {
-            is FirClassSymbol -> firBasedSymbol.classId.shortClassName.asString()
+            is FirClassLikeSymbol -> firBasedSymbol.classId.shortClassName.asString()
             is FirPropertyAccessorSymbol -> firBasedSymbol.fir.propertySymbol.name.asString()
             is FirFunctionSymbol -> firBasedSymbol.callableId.callableName.asString()
             is FirPropertySymbol -> firBasedSymbol.callableIdForRendering.callableName.asString()
             is FirVariableSymbol -> firBasedSymbol.name.asString()
+            is FirTypeParameterSymbol -> firBasedSymbol.name.asString()
             else -> firBasedSymbol.toString()
         }
 
@@ -176,6 +177,7 @@ class SemanticdbTextDocumentBuilder(
             is FirValueParameter -> Kind.PARAMETER
             is FirField -> Kind.FIELD
             is FirProperty -> Kind.FIELD
+            is FirEnumEntry -> Kind.FIELD
             is FirVariable -> Kind.LOCAL
             is FirCallableDeclaration -> Kind.METHOD
             is FirPackageDirective -> Kind.PACKAGE

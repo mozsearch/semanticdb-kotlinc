@@ -150,7 +150,17 @@ class SemanticdbSymbolsTest {
                         |    println(x)
                         |}
                         |""".trimMargin()),
-                    symbolsCacheData = SymbolCacheData(localsCount = 1)))
+                    symbolsCacheData = SymbolCacheData(localsCount = 1)),
+                ExpectedSymbols(
+                    "local functions",
+                    SourceFile.testKt(
+                        """
+                        |fun test() {
+                        |    fun localFun() {}
+                        |    fun localFunWithReturn(): Int = 0
+                        |}
+                        |""".trimMargin()),
+                    symbolsCacheData = SymbolCacheData(localsCount = 2)))
             .mapCheckExpectedSymbols()
 
     @TestFactory
