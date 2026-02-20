@@ -2127,6 +2127,239 @@ class AnalyzerTest {
         }
     }
 
+    @Test
+    fun `multiple supertype references`(@TempDir path: Path) {
+        val document =
+            compileSemanticdb(
+                path,
+                """
+                    package sample
+
+                    interface Named
+                    interface Speakable
+                    class Person : Named, Speakable
+                    fun use(p: Person): Named = p
+                """
+            )
+
+        assertSoftly(document.occurrencesList) {
+            withClue(this) {
+                shouldContain(SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "sample/Person#"
+                    range { startLine = 4; startCharacter = 6; endLine = 4; endCharacter = 12 }
+                })
+                shouldContain(SymbolOccurrence {
+                    role = Role.REFERENCE
+                    symbol = "sample/Named#"
+                    range { startLine = 4; startCharacter = 15; endLine = 4; endCharacter = 20 }
+                })
+                shouldContain(SymbolOccurrence {
+                    role = Role.REFERENCE
+                    symbol = "sample/Speakable#"
+                    range { startLine = 4; startCharacter = 22; endLine = 4; endCharacter = 31 }
+                })
+                shouldContain(SymbolOccurrence {
+                    role = Role.REFERENCE
+                    symbol = "sample/Named#"
+                    range { startLine = 5; startCharacter = 20; endLine = 5; endCharacter = 25 }
+                })
+            }
+        }
+
+        assertSoftly(document.symbolsList) {
+            withClue(this) {
+                shouldContain(SymbolInformation {
+                    symbol = "sample/Person#"
+                    kind = Kind.CLASS
+                    enclosingSymbol = "sample/"
+                    displayName = "Person"
+                    language = KOTLIN
+                    addOverriddenSymbols("sample/Named#")
+                    addOverriddenSymbols("sample/Speakable#")
+                    documentation =
+                        Documentation {
+                            format = Semanticdb.Documentation.Format.MARKDOWN
+                            message = "```kotlin\npublic final class Person : Named, Speakable\n```"
+                        }
+                })
+            }
+        }
+    }
+
+    @Test
+    fun `three-way overload disambiguator`(@TempDir path: Path) {
+        val document =
+            compileSemanticdb(
+                path,
+                """
+                    package sample
+
+                    fun add(x: Int, y: Int): Int = x + y
+                    fun add(x: Double, y: Double): Double = x + y
+                    fun add(x: String, y: String): String = x + y
+                    fun use() {
+                        add(1, 2)
+                        add(1.0, 2.0)
+                        add("a", "b")
+                    }
+                """
+            )
+
+        assertSoftly(document.occurrencesList) {
+            withClue(this) {
+                shouldContain(SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "sample/add()."
+                    range { startLine = 2; startCharacter = 4; endLine = 2; endCharacter = 7 }
+                })
+                shouldContain(SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "sample/add(+1)."
+                    range { startLine = 3; startCharacter = 4; endLine = 3; endCharacter = 7 }
+                })
+                shouldContain(SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "sample/add(+2)."
+                    range { startLine = 4; startCharacter = 4; endLine = 4; endCharacter = 7 }
+                })
+                shouldContain(SymbolOccurrence {
+                    role = Role.REFERENCE
+                    symbol = "sample/add()."
+                    range { startLine = 6; startCharacter = 4; endLine = 6; endCharacter = 7 }
+                })
+                shouldContain(SymbolOccurrence {
+                    role = Role.REFERENCE
+                    symbol = "sample/add(+1)."
+                    range { startLine = 7; startCharacter = 4; endLine = 7; endCharacter = 7 }
+                })
+                shouldContain(SymbolOccurrence {
+                    role = Role.REFERENCE
+                    symbol = "sample/add(+2)."
+                    range { startLine = 8; startCharacter = 4; endLine = 8; endCharacter = 7 }
+                })
+            }
+        }
+
+        assertSoftly(document.symbolsList) {
+            withClue(this) {
+                shouldContain(SymbolInformation {
+                    symbol = "sample/add()."
+                    kind = Kind.METHOD
+                    enclosingSymbol = "sample/"
+                    displayName = "add"
+                    language = KOTLIN
+                    documentation =
+                        Documentation {
+                            format = Semanticdb.Documentation.Format.MARKDOWN
+                            message = "```kotlin\npublic final fun add(x: Int, y: Int): Int\n```"
+                        }
+                })
+                shouldContain(SymbolInformation {
+                    symbol = "sample/add(+1)."
+                    kind = Kind.METHOD
+                    enclosingSymbol = "sample/"
+                    displayName = "add"
+                    language = KOTLIN
+                    documentation =
+                        Documentation {
+                            format = Semanticdb.Documentation.Format.MARKDOWN
+                            message = "```kotlin\npublic final fun add(x: Double, y: Double): Double\n```"
+                        }
+                })
+                shouldContain(SymbolInformation {
+                    symbol = "sample/add(+2)."
+                    kind = Kind.METHOD
+                    enclosingSymbol = "sample/"
+                    displayName = "add"
+                    language = KOTLIN
+                    documentation =
+                        Documentation {
+                            format = Semanticdb.Documentation.Format.MARKDOWN
+                            message = "```kotlin\npublic final fun add(x: String, y: String): String\n```"
+                        }
+                })
+            }
+        }
+    }
+
+    @Test
+    fun `type operators with user-defined types`(@TempDir path: Path) {
+        val document =
+            compileSemanticdb(
+                path,
+                """
+                    package sample
+
+                    class Wrapper
+                    fun classify(x: Any) {
+                        if (x is Wrapper) {}
+                        val w = x as Wrapper
+                        val s = x as? String
+                    }
+                """
+            )
+
+        assertSoftly(document.occurrencesList) {
+            withClue(this) {
+                shouldContain(SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "sample/Wrapper#"
+                    range { startLine = 2; startCharacter = 6; endLine = 2; endCharacter = 13 }
+                })
+                shouldContain(SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "sample/classify()."
+                    range { startLine = 3; startCharacter = 4; endLine = 3; endCharacter = 12 }
+                })
+                shouldContain(SymbolOccurrence {
+                    role = Role.REFERENCE
+                    symbol = "sample/Wrapper#"
+                    range { startLine = 4; startCharacter = 13; endLine = 4; endCharacter = 20 }
+                })
+                shouldContain(SymbolOccurrence {
+                    role = Role.REFERENCE
+                    symbol = "sample/Wrapper#"
+                    range { startLine = 5; startCharacter = 17; endLine = 5; endCharacter = 24 }
+                })
+                shouldContain(SymbolOccurrence {
+                    role = Role.REFERENCE
+                    symbol = "kotlin/String#"
+                    range { startLine = 6; startCharacter = 18; endLine = 6; endCharacter = 24 }
+                })
+            }
+        }
+
+        assertSoftly(document.symbolsList) {
+            withClue(this) {
+                shouldContain(SymbolInformation {
+                    symbol = "sample/Wrapper#"
+                    kind = Kind.CLASS
+                    enclosingSymbol = "sample/"
+                    displayName = "Wrapper"
+                    language = KOTLIN
+                    documentation =
+                        Documentation {
+                            format = Semanticdb.Documentation.Format.MARKDOWN
+                            message = "```kotlin\npublic final class Wrapper : Any\n```"
+                        }
+                })
+                shouldContain(SymbolInformation {
+                    symbol = "sample/classify()."
+                    kind = Kind.METHOD
+                    enclosingSymbol = "sample/"
+                    displayName = "classify"
+                    language = KOTLIN
+                    documentation =
+                        Documentation {
+                            format = Semanticdb.Documentation.Format.MARKDOWN
+                            message = "```kotlin\npublic final fun classify(x: Any): Unit\n```"
+                        }
+                })
+            }
+        }
+    }
+
     private fun TextDocument.assertDocumentation(symbol: String, expectedDocumentation: String) {
         val markdown =
             this.symbolsList.find { it.symbol == symbol }?.documentation?.message
