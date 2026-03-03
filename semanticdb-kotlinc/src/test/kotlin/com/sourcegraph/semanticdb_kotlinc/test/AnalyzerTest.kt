@@ -318,6 +318,90 @@ class AnalyzerTest {
     }
 
     @Test
+    fun `lambda parameters`(@TempDir path: Path) {
+        val document =
+            compileSemanticdb(
+                path,
+                """
+                    package sample
+
+                    fun use() {
+                        val f = { n: Int -> n * 2 }
+                    }
+                """
+            )
+
+        val occurrences =
+            arrayOf(
+                // val f is a local variable — gets local0 via isLocalMember
+                SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "local0"
+                    range { startLine = 3; startCharacter = 8; endLine = 3; endCharacter = 9 }
+                },
+                // n is a lambda parameter — gets local1 via the owner == Symbol.NONE path
+                // (the containing FirAnonymousFunction is skipped, yielding Symbol.NONE as owner)
+                SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "local1"
+                    range { startLine = 3; startCharacter = 14; endLine = 3; endCharacter = 15 }
+                },
+                // explicit type annotation on n emits a class reference
+                SymbolOccurrence {
+                    role = Role.REFERENCE
+                    symbol = "kotlin/Int#"
+                    range { startLine = 3; startCharacter = 17; endLine = 3; endCharacter = 20 }
+                },
+                // reference to n in the lambda body uses the same local symbol
+                SymbolOccurrence {
+                    role = Role.REFERENCE
+                    symbol = "local1"
+                    range { startLine = 3; startCharacter = 24; endLine = 3; endCharacter = 25 }
+                },
+            )
+        assertSoftly(document.occurrencesList) {
+            withClue(this) { occurrences.forEach(::shouldContain) }
+        }
+
+        val symbols =
+            arrayOf(
+                SymbolInformation {
+                    symbol = "sample/use()."
+                    kind = Kind.METHOD
+                    enclosingSymbol = "sample/"
+                    displayName = "use"
+                    language = KOTLIN
+                    documentation {
+                        message = "```kotlin\npublic final fun use(): Unit\n```"
+                        format = Semanticdb.Documentation.Format.MARKDOWN
+                    }
+                },
+                SymbolInformation {
+                    symbol = "local0"
+                    kind = Kind.FIELD
+                    enclosingSymbol = "sample/use()."
+                    displayName = "f"
+                    language = KOTLIN
+                    documentation {
+                        message = "```kotlin\nlocal val f: (Int) -> Int\n```"
+                        format = Semanticdb.Documentation.Format.MARKDOWN
+                    }
+                },
+                SymbolInformation {
+                    symbol = "local1"
+                    kind = Kind.PARAMETER
+                    displayName = "n"
+                    language = KOTLIN
+                    documentation {
+                        message = "```kotlin\nn: Int\n```"
+                        format = Semanticdb.Documentation.Format.MARKDOWN
+                    }
+                },
+            )
+        assertSoftly(document.symbolsList) { withClue(this) { symbols.forEach(::shouldContain) } }
+    }
+
+    @Test
     fun overrides(@TempDir path: Path) {
         val document =
             compileSemanticdb(
