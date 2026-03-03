@@ -17,6 +17,7 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 
 class PostAnalysisExtension(
+    private val configuration: CompilerConfiguration,
     private val sourceRoot: Path,
     private val targetRoot: Path,
     private val callback: (Semanticdb.TextDocument) -> Unit
@@ -63,11 +64,10 @@ class PostAnalysisExtension(
     }
 
     private val messageCollector =
-        CompilerConfiguration()
-            .get(
-                CommonConfigurationKeys.MESSAGE_COLLECTOR_KEY,
-                PrintingMessageCollector(System.err, MessageRenderer.PLAIN_FULL_PATHS, false)
-            )
+        configuration.get(
+            CommonConfigurationKeys.MESSAGE_COLLECTOR_KEY,
+            PrintingMessageCollector(System.err, MessageRenderer.PLAIN_FULL_PATHS, false)
+        )
 
     private fun handleException(e: Exception) {
         val writer =
@@ -75,7 +75,7 @@ class PostAnalysisExtension(
                 object : Writer() {
                     val buf = StringBuffer()
                     override fun close() =
-                        messageCollector.report(CompilerMessageSeverity.EXCEPTION, buf.toString())
+                        messageCollector.report(CompilerMessageSeverity.WARNING, buf.toString())
 
                     override fun flush() = Unit
                     override fun write(data: CharArray, offset: Int, len: Int) {
