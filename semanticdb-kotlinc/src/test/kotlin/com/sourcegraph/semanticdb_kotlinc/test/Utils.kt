@@ -198,7 +198,10 @@ fun semanticdbVisitorAnalyzer(
                 })
             IrGenerationExtension.registerExtension(
                 PostAnalysisExtension(
-                    sourceRoot = sourceroot, targetRoot = Paths.get(""), callback = hook
+                    configuration = configuration,
+                    sourceRoot = sourceroot,
+                    targetRoot = Paths.get(""),
+                    callback = hook
                 )
             )
         }
