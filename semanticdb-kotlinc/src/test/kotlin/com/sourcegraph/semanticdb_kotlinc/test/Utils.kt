@@ -118,6 +118,7 @@ private fun configureTestCompiler(
             sources = listOf(source)
             inheritClassPath = true
             verbose = false
+            kotlincArguments = listOf("-Werror")
         }
 
     val analyzer = semanticdbVisitorAnalyzer(globals, locals, compilation.workingDir.toPath(), hook)

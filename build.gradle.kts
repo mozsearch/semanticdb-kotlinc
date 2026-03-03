@@ -10,5 +10,9 @@ subprojects {
                 languageVersion = JavaLanguageVersion.of(17)
             }
         }
+        extensions.findByType<org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension>()
+            ?.compilerOptions
+            ?.allWarningsAsErrors
+            ?.set(true)
     }
 }
