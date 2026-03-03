@@ -372,7 +372,7 @@ open class AnalyzerCheckers(session: FirSession) : FirAdditionalCheckersExtensio
 
             val resolvedSymbol = calleeReference.resolvedSymbol
             if (resolvedSymbol.origin == FirDeclarationOrigin.SamConstructor && resolvedSymbol is FirSyntheticFunctionSymbol) {
-                val referencedKlass = resolvedSymbol.resolvedReturnType.toClassLikeSymbol(context.session)
+                val referencedKlass = resolvedSymbol.resolvedReturnType.toClassLikeSymbol()
                 if (referencedKlass != null) {
                     visitor?.visitClassReference(referencedKlass, getIdentifier(calleeReference.source ?: source))
                 }

@@ -195,7 +195,7 @@ class GlobalSymbolsCache(testing: Boolean = false) : Iterable<Symbol> {
         val siblings =
             when (val containingSymbol = symbol.getContainingSymbol(session)) {
                 is FirClassSymbol ->
-                    (containingSymbol.fir as FirClass).declarations.map { it.symbol }
+                    containingSymbol.fir.declarations.map { it.symbol }
 
                 is FirFileSymbol -> containingSymbol.fir.declarations.map { it.symbol }
                 null ->
