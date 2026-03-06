@@ -4,7 +4,7 @@ import com.sourcegraph.semanticdb_kotlinc.SemanticdbSymbolDescriptor.Kind
 import java.lang.System.err
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
-import org.jetbrains.kotlin.fir.analysis.checkers.declaration.isLocalMember
+import org.jetbrains.kotlin.fir.analysis.checkers.declaration.isLocalDeclaredInBlock
 import org.jetbrains.kotlin.fir.declarations.DirectDeclarationsAccess
 import org.jetbrains.kotlin.fir.declarations.FirClass
 import org.jetbrains.kotlin.fir.declarations.FirDeclarationOrigin
@@ -91,7 +91,7 @@ class GlobalSymbolsCache(testing: Boolean = false) : Iterable<Symbol> {
     ): Symbol {
         if (skip(symbol)) return Symbol.NONE
 
-        if (symbol.fir.isLocalMember) return locals + symbol
+        if (symbol.fir.isLocalDeclaredInBlock) return locals + symbol
 
         val owner = getParentSymbol(symbol, locals)
 
