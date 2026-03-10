@@ -4,7 +4,7 @@ kctfork = "0.12.1"
 kotlin = "2.3.10"
 kotest = "6.1.7"
 protobuf = "4.33.5"
-shadow = "9.3.1"
+shadow = "9.4.0"
 
 [libraries]
 kctfork-core = { module = "dev.zacsweers.kctfork:core", version.ref = "kctfork" }
