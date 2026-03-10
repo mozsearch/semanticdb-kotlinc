@@ -3,7 +3,7 @@ google-protobuf-plugin = "0.9.6"
 kctfork = "0.12.1"
 kotlin = "2.3.10"
 kotest = "6.1.7"
-protobuf = "4.33.5"
+protobuf = "4.34.0"
 shadow = "9.4.0"
 
 [libraries]
