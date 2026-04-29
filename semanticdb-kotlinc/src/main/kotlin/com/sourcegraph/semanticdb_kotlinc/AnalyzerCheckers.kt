@@ -223,7 +223,7 @@ open class AnalyzerCheckers(session: FirSession) : FirAdditionalCheckersExtensio
                 } else {
                     null
                 }
-            visitor?.visitClassOrObject(declaration, objectKeyword ?: companionKeyword ?: identifierSource)
+            visitor?.visitClassOrObject(declaration, objectKeyword ?: companionKeyword ?: identifierSource, enclosingSource = source)
 
             if (declaration is FirClass) {
                 for (superType in declaration.superTypeRefs) {
@@ -263,10 +263,11 @@ open class AnalyzerCheckers(session: FirSession) : FirAdditionalCheckersExtensio
 
                 visitor?.visitPrimaryConstructor(
                     declaration,
-                    constructorKeyboard ?: objectKeyword ?: getIdentifier(klassSource)
+                    constructorKeyboard ?: objectKeyword ?: getIdentifier(klassSource),
+                    enclosingSource = source,
                 )
             } else {
-                visitor?.visitSecondaryConstructor(declaration, getIdentifier(source))
+                visitor?.visitSecondaryConstructor(declaration, getIdentifier(source), enclosingSource = source)
             }
         }
     }
@@ -278,7 +279,7 @@ open class AnalyzerCheckers(session: FirSession) : FirAdditionalCheckersExtensio
             val source = declaration.source ?: return
             val ktFile = context.containingFileSymbol?.sourceFile ?: return
             val visitor = visitors[ktFile]
-            visitor?.visitNamedFunction(declaration, getIdentifier(source))
+            visitor?.visitNamedFunction(declaration, getIdentifier(source), enclosingSource = source)
             visitor?.emitTypeRef(declaration.returnTypeRef)
             declaration.receiverParameter?.typeRef?.let { visitor?.emitTypeRef(it) }
         }
@@ -292,7 +293,7 @@ open class AnalyzerCheckers(session: FirSession) : FirAdditionalCheckersExtensio
             val source = declaration.source ?: return
             val ktFile = context.containingFileSymbol?.sourceFile ?: return
             val visitor = visitors[ktFile]
-            visitor?.visitNamedFunction(declaration, source)
+            visitor?.visitNamedFunction(declaration, source, enclosingSource = source)
         }
     }
 
@@ -303,7 +304,7 @@ open class AnalyzerCheckers(session: FirSession) : FirAdditionalCheckersExtensio
             val source = declaration.source ?: return
             val ktFile = context.containingFileSymbol?.sourceFile ?: return
             val visitor = visitors[ktFile]
-            visitor?.visitProperty(declaration, getIdentifier(source))
+            visitor?.visitProperty(declaration, getIdentifier(source), enclosingSource = source)
             visitor?.emitTypeRef(declaration.returnTypeRef)
             declaration.receiverParameter?.typeRef?.let { visitor?.emitTypeRef(it) }
         }
@@ -316,7 +317,7 @@ open class AnalyzerCheckers(session: FirSession) : FirAdditionalCheckersExtensio
             val source = declaration.source ?: return
             val ktFile = context.containingFileSymbol?.sourceFile ?: return
             val visitor = visitors[ktFile]
-            visitor?.visitParameter(declaration, getIdentifier(source))
+            visitor?.visitParameter(declaration, getIdentifier(source), enclosingSource = source)
             visitor?.emitTypeRef(declaration.returnTypeRef)
         }
     }
@@ -328,7 +329,7 @@ open class AnalyzerCheckers(session: FirSession) : FirAdditionalCheckersExtensio
             val source = declaration.source ?: return
             val ktFile = context.containingFileSymbol?.sourceFile ?: return
             val visitor = visitors[ktFile]
-            visitor?.visitTypeParameter(declaration, getIdentifier(source))
+            visitor?.visitTypeParameter(declaration, getIdentifier(source), enclosingSource = source)
         }
     }
 
@@ -339,7 +340,7 @@ open class AnalyzerCheckers(session: FirSession) : FirAdditionalCheckersExtensio
             val source = declaration.source ?: return
             val ktFile = context.containingFileSymbol?.sourceFile ?: return
             val visitor = visitors[ktFile]
-            visitor?.visitTypeAlias(declaration, getIdentifier(source))
+            visitor?.visitTypeAlias(declaration, getIdentifier(source), enclosingSource = source)
         }
     }
 
@@ -368,7 +369,7 @@ open class AnalyzerCheckers(session: FirSession) : FirAdditionalCheckersExtensio
                     getIdentifier(source)
                 }
 
-            visitor?.visitPropertyAccessor(declaration, identifierSource)
+            visitor?.visitPropertyAccessor(declaration, identifierSource, enclosingSource = source)
         }
     }
 
