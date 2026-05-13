@@ -1,4 +1,4 @@
-rootProject.name = "lsif-kotlin"
+rootProject.name = "semanticdb-kotlinc-plugin"
 
 dependencyResolutionManagement {
     repositories {
@@ -7,7 +7,6 @@ dependencyResolutionManagement {
 }
 
 include(
-    "semanticdb-kotlin",
     "semanticdb-kotlinc",
 )
 
