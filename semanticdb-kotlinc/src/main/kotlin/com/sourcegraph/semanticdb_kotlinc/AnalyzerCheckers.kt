@@ -380,7 +380,7 @@ open class AnalyzerCheckers(session: FirSession) : FirAdditionalCheckersExtensio
             val source = declaration.source ?: return
             val ktFile = context.containingFileSymbol?.sourceFile ?: return
             val visitor = visitors[ktFile]
-            visitor?.visitEnumEntry(declaration, getIdentifier(source))
+            visitor?.visitEnumEntry(declaration, getIdentifier(source), enclosingSource = source)
         }
     }
 

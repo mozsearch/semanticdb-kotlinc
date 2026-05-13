@@ -2091,16 +2091,19 @@ class AnalyzerTest {
                     role = Role.DEFINITION
                     symbol = "sample/Color#RED."
                     range { startLine = 2; startCharacter = 19; endLine = 2; endCharacter = 22 }
+                    enclosingRange { startLine = 2; startCharacter = 19; endLine = 2; endCharacter = 23 }
                 })
                 shouldContain(SymbolOccurrence {
                     role = Role.DEFINITION
                     symbol = "sample/Color#GREEN."
                     range { startLine = 2; startCharacter = 24; endLine = 2; endCharacter = 29 }
+                    enclosingRange { startLine = 2; startCharacter = 24; endLine = 2; endCharacter = 30 }
                 })
                 shouldContain(SymbolOccurrence {
                     role = Role.DEFINITION
                     symbol = "sample/Color#BLUE."
                     range { startLine = 2; startCharacter = 31; endLine = 2; endCharacter = 35 }
+                    enclosingRange { startLine = 2; startCharacter = 31; endLine = 2; endCharacter = 35 }
                 })
                 shouldContain(SymbolOccurrence {
                     role = Role.REFERENCE

@@ -115,8 +115,8 @@ class SemanticdbVisitor(
     }
 
     context(context: CheckerContext)
-    fun visitEnumEntry(firEnumEntry: FirEnumEntry, source: KtSourceElement) {
-        cache[firEnumEntry.symbol].with(firEnumEntry.symbol).emitAll(source, Role.DEFINITION)
+    fun visitEnumEntry(firEnumEntry: FirEnumEntry, source: KtSourceElement, enclosingSource: KtSourceElement? = null) {
+        cache[firEnumEntry.symbol].with(firEnumEntry.symbol).emitAll(source, Role.DEFINITION, enclosingSource)
     }
 
     context(context: CheckerContext)
