@@ -87,7 +87,7 @@ class PostAnalysisExtension(
         writer.println("Exception in semanticdb-kotlin compiler plugin:")
         e.printStackTrace(writer)
         writer.println(
-            "Please report a bug to https://github.com/sourcegraph/lsif-kotlin with the stack trace above."
+            "Please report a bug to https://github.com/mozsearch/semanticdb-kotlinc with the stack trace above."
         )
         writer.close()
     }

@@ -2,6 +2,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.protobuf)
     alias(libs.plugins.shadow)
 }
 
@@ -9,12 +10,28 @@ dependencies {
     implementation(kotlin("stdlib"))
     compileOnly(kotlin("compiler-embeddable"))
     implementation(libs.protobuf.java)
-    implementation(projects.semanticdbKotlin)
 
     testImplementation(kotlin("compiler-embeddable"))
     testImplementation(kotlin("test"))
     testImplementation(libs.kotest.assertions.core)
     testImplementation(libs.kctfork.core)
+}
+
+protobuf {
+    protoc {
+        artifact = libs.protobuf.protoc.get().toString()
+    }
+    plugins {
+        kotlin { }
+    }
+}
+
+tasks.processResources {
+    dependsOn(tasks.named("generateProto"))
+}
+
+tasks.compileKotlin {
+    dependsOn(tasks.named("generateProto"))
 }
 
 kotlin {
