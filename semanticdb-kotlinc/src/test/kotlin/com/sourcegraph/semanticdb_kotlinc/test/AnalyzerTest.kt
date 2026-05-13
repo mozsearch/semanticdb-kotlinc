@@ -665,6 +665,44 @@ class AnalyzerTest {
     }
 
     @Test
+    fun `generic class declaration`(@TempDir path: Path) {
+        val document =
+            compileSemanticdb(
+                path,
+                """
+                    package sample
+
+                    class Box<T>(val value: T) {
+                        fun unwrap(): T = value
+                    }
+                """
+            )
+
+        assertSoftly(document.occurrencesList) {
+            withClue(this) {
+                shouldContain(SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "sample/Box#"
+                    range { startLine = 2; startCharacter = 6; endLine = 2; endCharacter = 9 }
+                    enclosingRange { startLine = 2; endLine = 4; endCharacter = 1 }
+                })
+                shouldContain(SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "sample/Box#[T]"
+                    range { startLine = 2; startCharacter = 10; endLine = 2; endCharacter = 11 }
+                    enclosingRange { startLine = 2; startCharacter = 10; endLine = 2; endCharacter = 11 }
+                })
+                shouldContain(SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "sample/Box#unwrap()."
+                    range { startLine = 3; startCharacter = 8; endLine = 3; endCharacter = 14 }
+                    enclosingRange { startLine = 3; startCharacter = 4; endLine = 3; endCharacter = 27 }
+                })
+            }
+        }
+    }
+
+    @Test
     fun overrides(@TempDir path: Path) {
         val document =
             compileSemanticdb(
@@ -2167,6 +2205,81 @@ class AnalyzerTest {
                         Documentation {
                             format = Semanticdb.Documentation.Format.MARKDOWN
                             message = "```kotlin\npublic final static enum entry BLUE: Color\n```"
+                        }
+                })
+            }
+        }
+    }
+
+    @Test
+    fun `enum entry with body`(@TempDir path: Path) {
+        val document =
+            compileSemanticdb(
+                path,
+                """
+                    package sample
+
+                    enum class Op {
+                        PLUS {
+                            override fun apply(a: Int, b: Int) = a + b
+                        };
+
+                        abstract fun apply(a: Int, b: Int): Int
+                    }
+                """
+            )
+
+        assertSoftly(document.occurrencesList) {
+            withClue(this) {
+                shouldContain(SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "sample/Op#PLUS."
+                    range { startLine = 3; startCharacter = 4; endLine = 3; endCharacter = 8 }
+                    // Body-having enum entry: enclosing_range covers PLUS through the
+                    // trailing `};` that terminates the entry list.
+                    enclosingRange { startLine = 3; startCharacter = 4; endLine = 5; endCharacter = 6 }
+                })
+                // An enum entry with a body is modeled as a synthetic anonymous subclass,
+                // so its overridden member is a local symbol (local2), not a global
+                // sample/Op#PLUS.apply(). It still gets an enclosing_range spanning the
+                // function declaration.
+                shouldContain(SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "local2"
+                    range { startLine = 4; startCharacter = 21; endLine = 4; endCharacter = 26 }
+                    enclosingRange { startLine = 4; startCharacter = 8; endLine = 4; endCharacter = 50 }
+                })
+            }
+        }
+
+        assertSoftly(document.symbolsList) {
+            withClue(this) {
+                // The entry body becomes an anonymous class enclosed by the entry...
+                shouldContain(SymbolInformation {
+                    symbol = "local0"
+                    kind = Kind.CLASS
+                    enclosingSymbol = "sample/Op#PLUS."
+                    displayName = "<anonymous>"
+                    language = KOTLIN
+                    addOverriddenSymbols("sample/Op#")
+                    documentation =
+                        Documentation {
+                            format = Semanticdb.Documentation.Format.MARKDOWN
+                            message = "```kotlin\nobject : Op\n```"
+                        }
+                })
+                // ...and the override is a method of that anonymous class.
+                shouldContain(SymbolInformation {
+                    symbol = "local2"
+                    kind = Kind.METHOD
+                    enclosingSymbol = "local0"
+                    displayName = "apply"
+                    language = KOTLIN
+                    addOverriddenSymbols("sample/Op#apply().")
+                    documentation =
+                        Documentation {
+                            format = Semanticdb.Documentation.Format.MARKDOWN
+                            message = "```kotlin\npublic open override fun apply(a: Int, b: Int): Int\n```"
                         }
                 })
             }
