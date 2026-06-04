@@ -34,14 +34,6 @@ tasks.compileKotlin {
     dependsOn(tasks.named("generateProto"))
 }
 
-kotlin {
-    compilerOptions {
-        freeCompilerArgs.addAll(
-            "-Xcontext-parameters",
-        )
-    }
-}
-
 val semanticdbJar: Configuration by configurations.creating {
     isCanBeConsumed = true
     isCanBeResolved = false
