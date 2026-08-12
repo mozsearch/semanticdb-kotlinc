@@ -55,7 +55,6 @@ tasks.jar {
 
 tasks.shadowJar {
     archiveClassifier = ""
-    relocate("com.intellij", "org.jetbrains.kotlin.com.intellij")
     minimize()
 }
 
