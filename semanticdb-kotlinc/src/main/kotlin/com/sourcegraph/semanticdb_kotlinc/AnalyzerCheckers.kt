@@ -83,8 +83,8 @@ open class AnalyzerCheckers(session: FirSession) : FirAdditionalCheckersExtensio
             setOf(SemanticClassLikeChecker())
         override val constructorCheckers: Set<FirConstructorChecker> =
             setOf(SemanticConstructorChecker())
-        override val simpleFunctionCheckers: Set<FirSimpleFunctionChecker> =
-            setOf(SemanticSimpleFunctionChecker())
+        override val namedFunctionCheckers: Set<FirNamedFunctionChecker> =
+            setOf(SemanticNamedFunctionChecker())
         override val anonymousFunctionCheckers: Set<FirAnonymousFunctionChecker> =
             setOf(SemanticAnonymousFunctionChecker())
         override val propertyCheckers: Set<FirPropertyChecker> = setOf(SemanticPropertyChecker())
@@ -272,7 +272,7 @@ open class AnalyzerCheckers(session: FirSession) : FirAdditionalCheckersExtensio
         }
     }
 
-    private class SemanticSimpleFunctionChecker : FirSimpleFunctionChecker(MppCheckerKind.Common) {
+    private class SemanticNamedFunctionChecker : FirNamedFunctionChecker(MppCheckerKind.Common) {
         @OptIn(ExperimentalContracts::class)
         context(context: CheckerContext, reporter: DiagnosticReporter)
         override fun check(declaration: FirNamedFunction) {
@@ -389,7 +389,7 @@ open class AnalyzerCheckers(session: FirSession) : FirAdditionalCheckersExtensio
         @OptIn(ExperimentalContracts::class)
         context(context: CheckerContext, reporter: DiagnosticReporter)
         override fun check(expression: FirResolvedQualifier) {
-            val symbol = expression.symbol ?: return
+            val symbol = expression.qualifierSymbol?: return
             val source = expression.source ?: return
             if (source.kind is KtFakeSourceElementKind) return
             val ktFile = context.containingFileSymbol?.sourceFile ?: return

@@ -9,10 +9,7 @@ import kotlin.contracts.ExperimentalContracts
 import org.jetbrains.kotlin.KtSourceFile
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
-import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
-import org.jetbrains.kotlin.cli.common.messages.MessageRenderer
-import org.jetbrains.kotlin.cli.common.messages.PrintingMessageCollector
-import org.jetbrains.kotlin.config.CommonConfigurationKeys
+import org.jetbrains.kotlin.cli.report
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 
@@ -63,19 +60,13 @@ class PostAnalysisExtension(
         return null
     }
 
-    private val messageCollector =
-        configuration.get(
-            CommonConfigurationKeys.MESSAGE_COLLECTOR_KEY,
-            PrintingMessageCollector(System.err, MessageRenderer.PLAIN_FULL_PATHS, false)
-        )
-
     private fun handleException(e: Exception) {
         val writer =
             PrintWriter(
                 object : Writer() {
                     val buf = StringBuffer()
                     override fun close() =
-                        messageCollector.report(CompilerMessageSeverity.WARNING, buf.toString())
+                        configuration.report(SemanticDbKotlincDiagnostics.EXCEPTION_WARNING, buf.toString())
 
                     override fun flush() = Unit
                     override fun write(data: CharArray, offset: Int, len: Int) {
