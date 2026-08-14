@@ -1,10 +1,10 @@
 [versions]
 google-protobuf-plugin = "0.10.0"
 kctfork = "0.13.0"
-kotlin = "2.4.0"
-kotest = "6.1.11"
-protobuf = "4.35.0"
-shadow = "9.4.2"
+kotlin = "2.4.10"
+kotest = "6.2.4"
+protobuf = "4.35.1"
+shadow = "9.6.1"
 
 [libraries]
 kctfork-core = { module = "dev.zacsweers.kctfork:core", version.ref = "kctfork" }
