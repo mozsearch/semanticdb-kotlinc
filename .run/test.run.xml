@@ -1,10 +1,10 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="lsif-kotlin:semanticdb-kotlinc [test]" type="GradleRunConfiguration" factoryName="Gradle">
+  <configuration default="false" name="test" type="GradleRunConfiguration" factoryName="Gradle">
     <ExternalSystemSettings>
       <option name="executionName" />
-      <option name="externalProjectPath" value="$PROJECT_DIR$/semanticdb-kotlinc" />
+      <option name="externalProjectPath" value="$PROJECT_DIR$" />
       <option name="externalSystemIdString" value="GRADLE" />
-      <option name="scriptParameters" value="" />
+      <option name="scriptParameters" value="-Dkotlin.compiler.execution.strategy=&quot;in-process&quot;" />
       <option name="taskDescriptions">
         <list />
       </option>
