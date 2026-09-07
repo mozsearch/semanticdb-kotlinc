@@ -1,13 +1,7 @@
-rootProject.name = "semanticdb-kotlinc-plugin"
+rootProject.name = "semanticdb-kotlinc"
 
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
     }
 }
-
-include(
-    "semanticdb-kotlinc",
-)
-
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
