@@ -1,7 +1,7 @@
 [versions]
 google-protobuf-plugin = "0.10.0"
 kctfork = "0.13.0"
-kotlin = "2.4.20-RC"
+kotlin = "2.4.20"
 kotest = "6.2.4"
 protobuf = "4.36.1"
 shadow = "9.6.1"
