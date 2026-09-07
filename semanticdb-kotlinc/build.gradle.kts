@@ -34,7 +34,7 @@ tasks.compileKotlin {
     dependsOn(tasks.named("generateProto"))
 }
 
-val semanticdbJar: Configuration by configurations.creating {
+val semanticdbJar: Configuration = configurations.create("semanticdbJar") {
     isCanBeConsumed = true
     isCanBeResolved = false
 }
