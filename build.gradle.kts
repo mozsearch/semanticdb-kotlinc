@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.protobuf)
     alias(libs.plugins.shadow)
+    `maven-publish`
 }
 
 dependencies {
@@ -70,3 +71,18 @@ kotlin {
         allWarningsAsErrors = true
     }
 }
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenShadow") {
+            from(components["shadow"])
+        }
+    }
+    repositories {
+        maven {
+            group = "com.github.mozsearch"
+            url = uri(layout.buildDirectory.dir("repo"))
+        }
+    }
+}
+
