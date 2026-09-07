@@ -3,7 +3,7 @@ on:
   push:
   pull_request:
 jobs:
-  test:
+  ci:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -14,3 +14,10 @@ jobs:
           cache: 'gradle'
       - name: Test
         run: ./gradlew test
+      - name: Build Maven artifacts
+        run: ./gradlew -Pversion=${{ github.ref_type == 'tag' && github.ref_name || github.sha }} publish
+      - uses: actions/upload-artifact@v7
+        with:
+          name: maven-artifacts
+          path: build/repo
+          if-no-files-found: error
