@@ -200,7 +200,7 @@ fun semanticdbVisitorAnalyzer(
                 PostAnalysisExtension(
                     configuration = configuration,
                     sourceRoot = sourceroot,
-                    targetRoot = Paths.get(""),
+                    targetRoot = sourceroot,
                     callback = hook
                 )
             )
