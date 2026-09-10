@@ -117,7 +117,7 @@ class SemanticdbTextDocumentBuilder(
             this.role = role
             this.range = semanticdbRange(element)
             if (enclosingSource != null) {
-                this.enclosingRange = semanticdbEnclosingRange(enclosingSource)
+                this.enclosingRange = semanticdbEnclosingRange(element, enclosingSource)
             }
         }
 
@@ -129,12 +129,16 @@ class SemanticdbTextDocumentBuilder(
             endLine = lineMap.lineNumber(element) - 1
         }
 
-    private fun semanticdbEnclosingRange(element: KtSourceElement): Semanticdb.Range {
+    // A keyword-less primary constructor is anchored on the class identifier, outside its own
+    // parameter-list source, so the range spans both.
+    private fun semanticdbEnclosingRange(anchor: KtSourceElement, element: KtSourceElement): Semanticdb.Range {
+        val startOffset = minOf(anchor.startOffset, element.startOffset)
+        val endOffset = maxOf(anchor.endOffset, element.endOffset)
         return Range {
-            startLine = lineMap.lineNumber(element) - 1
-            startCharacter = lineMap.startCharacter(element)
-            endLine = lineMap.lineNumberForOffset(element.endOffset) - 1
-            endCharacter = lineMap.columnForOffset(element.endOffset)
+            startLine = lineMap.lineNumberForOffset(startOffset) - 1
+            startCharacter = lineMap.columnForOffset(startOffset)
+            endLine = lineMap.lineNumberForOffset(endOffset) - 1
+            endCharacter = lineMap.columnForOffset(endOffset)
         }
     }
 
