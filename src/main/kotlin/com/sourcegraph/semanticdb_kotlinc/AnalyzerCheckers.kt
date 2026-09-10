@@ -47,6 +47,16 @@ open class AnalyzerCheckers(session: FirSession) : FirAdditionalCheckersExtensio
                 .findChildByType(element.lighterASTNode, KtTokens.IDENTIFIER)
                 ?.toKtLightSourceElement(element.treeStructure) ?: element
 
+        // COMPANION_KEYWORD is inside a MODIFIER_LIST child, so findChildByType would miss it.
+        private fun getClassIdentifier(source: KtSourceElement, isCompanion: Boolean): KtSourceElement {
+            val identifier = getIdentifier(source)
+            if (identifier !== source || !isCompanion) return identifier
+            return source
+                .treeStructure
+                .findDescendantByType(source.lighterASTNode, KtTokens.COMPANION_KEYWORD)
+                ?.toKtLightSourceElement(source.treeStructure) ?: source
+        }
+
         @OptIn(ExperimentalContracts::class)
         context(context: CheckerContext)
         private fun SemanticdbVisitor.emitTypeRef(typeRef: FirTypeRef) {
@@ -209,21 +219,9 @@ open class AnalyzerCheckers(session: FirSession) : FirAdditionalCheckersExtensio
             } else {
                 null
             }
-            val identifierSource = getIdentifier(source)
-            // For unnamed companion objects, getIdentifier() falls back to source (no IDENTIFIER
-            // token). Use the 'companion' keyword as the range instead. The COMPANION_KEYWORD is
-            // inside a MODIFIER_LIST child, so we use findDescendantByType instead of
-            // findChildByType.
-            val companionKeyword =
-                if (identifierSource === source && declaration is FirRegularClass && declaration.isCompanion) {
-                    source
-                        .treeStructure
-                        .findDescendantByType(source.lighterASTNode, KtTokens.COMPANION_KEYWORD)
-                        ?.toKtLightSourceElement(source.treeStructure)
-                } else {
-                    null
-                }
-            visitor?.visitClassOrObject(declaration, objectKeyword ?: companionKeyword ?: identifierSource, enclosingSource = source)
+            val identifierSource =
+                getClassIdentifier(source, declaration is FirRegularClass && declaration.isCompanion)
+            visitor?.visitClassOrObject(declaration, objectKeyword ?: identifierSource, enclosingSource = source)
 
             if (declaration is FirClass) {
                 for (superType in declaration.superTypeRefs) {
@@ -261,9 +259,10 @@ open class AnalyzerCheckers(session: FirSession) : FirAdditionalCheckersExtensio
                     null
                 }
 
+                val klassIdentifier = getClassIdentifier(klassSource, klass?.isCompanion == true)
                 visitor?.visitPrimaryConstructor(
                     declaration,
-                    constructorKeyboard ?: objectKeyword ?: getIdentifier(klassSource),
+                    constructorKeyboard ?: objectKeyword ?: klassIdentifier,
                     enclosingSource = source,
                 )
             } else {

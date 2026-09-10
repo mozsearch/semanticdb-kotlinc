@@ -2503,6 +2503,12 @@ class AnalyzerTest {
                     range { startLine = 3; startCharacter = 4; endLine = 3; endCharacter = 13 }
                     enclosingRange { startLine = 3; startCharacter = 4; endLine = 5; endCharacter = 5 }
                 })
+                shouldContain(SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "sample/Bar#Companion#`<init>`()."
+                    range { startLine = 3; startCharacter = 4; endLine = 3; endCharacter = 13 }
+                    enclosingRange { startLine = 3; startCharacter = 4; endLine = 5; endCharacter = 5 }
+                })
             }
         }
 

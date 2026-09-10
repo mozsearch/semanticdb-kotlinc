@@ -614,7 +614,7 @@ class SemanticdbSymbolsTest {
                                             endCharacter = 12
                                         }
                                         enclosingRange {
-                                            startCharacter = 12
+                                            startCharacter = 6
                                             endCharacter = 23
                                         }
                                     },
