@@ -2457,6 +2457,96 @@ class AnalyzerTest {
     }
 
     @Test
+    fun `multi-line primary constructor enclosing range`(@TempDir path: Path) {
+        val document =
+            compileSemanticdb(
+                path,
+                """
+                    package sample
+
+                    class Point(
+                        val x: Int,
+                        val y: Int,
+                    )
+                """
+            )
+
+        assertSoftly(document.occurrencesList) {
+            withClue(this) {
+                shouldContain(SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "sample/Point#"
+                    range { startLine = 2; startCharacter = 6; endLine = 2; endCharacter = 11 }
+                    enclosingRange { startLine = 2; endLine = 5; endCharacter = 1 }
+                })
+                shouldContain(SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "sample/Point#`<init>`()."
+                    range { startLine = 2; startCharacter = 6; endLine = 2; endCharacter = 11 }
+                    enclosingRange { startLine = 2; startCharacter = 6; endLine = 5; endCharacter = 1 }
+                })
+                shouldContain(SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "sample/Point#`<init>`().(x)"
+                    range { startLine = 3; startCharacter = 8; endLine = 3; endCharacter = 9 }
+                    enclosingRange { startLine = 3; startCharacter = 4; endLine = 3; endCharacter = 14 }
+                })
+            }
+        }
+    }
+
+    @Test
+    fun `local class and anonymous object constructor ranges`(@TempDir path: Path) {
+        val document =
+            compileSemanticdb(
+                path,
+                """
+                    package sample
+
+                    interface Greeter {
+                        fun greet(): String
+                    }
+
+                    fun outer() {
+                        class Local(val n: Int)
+                        val g = object : Greeter {
+                            override fun greet() = "hi"
+                        }
+                    }
+                """
+            )
+
+        assertSoftly(document.occurrencesList) {
+            withClue(this) {
+                shouldContain(SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "local0"
+                    range { startLine = 7; startCharacter = 10; endLine = 7; endCharacter = 15 }
+                    enclosingRange { startLine = 7; startCharacter = 4; endLine = 7; endCharacter = 27 }
+                })
+                shouldContain(SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "local1"
+                    range { startLine = 7; startCharacter = 10; endLine = 7; endCharacter = 15 }
+                    enclosingRange { startLine = 7; startCharacter = 10; endLine = 7; endCharacter = 27 }
+                })
+                shouldContain(SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "local6"
+                    range { startLine = 8; startCharacter = 12; endLine = 8; endCharacter = 18 }
+                    enclosingRange { startLine = 8; startCharacter = 12; endLine = 10; endCharacter = 5 }
+                })
+                shouldContain(SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "local7"
+                    range { startLine = 8; startCharacter = 12; endLine = 8; endCharacter = 18 }
+                    enclosingRange { startLine = 8; startCharacter = 12; endLine = 10; endCharacter = 5 }
+                })
+            }
+        }
+    }
+
+    @Test
     fun `unnamed companion object`(@TempDir path: Path) {
         val document =
             compileSemanticdb(
@@ -2500,6 +2590,12 @@ class AnalyzerTest {
                 shouldContain(SymbolOccurrence {
                     role = Role.DEFINITION
                     symbol = "sample/Bar#Companion#"
+                    range { startLine = 3; startCharacter = 4; endLine = 3; endCharacter = 13 }
+                    enclosingRange { startLine = 3; startCharacter = 4; endLine = 5; endCharacter = 5 }
+                })
+                shouldContain(SymbolOccurrence {
+                    role = Role.DEFINITION
+                    symbol = "sample/Bar#Companion#`<init>`()."
                     range { startLine = 3; startCharacter = 4; endLine = 3; endCharacter = 13 }
                     enclosingRange { startLine = 3; startCharacter = 4; endLine = 5; endCharacter = 5 }
                 })
